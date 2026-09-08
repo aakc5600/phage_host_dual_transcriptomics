@@ -204,3 +204,82 @@ def make_unique(lst):
         unique_list.append(new_item)
     
     return unique_list
+
+# Add a classification label based on exceeding 20 % of maximal expression
+# Takes time after which genes are "middle" or "late" genes
+
+def classLabelThreshold(tpm, middle, late):
+    labels = []
+    #extract all measured timings from column names
+    timings = tpm.iloc[:,:-2].columns.astype(float).tolist()
+
+    i = 0
+    while i < tpm.shape[0]:
+        # Get array of expression values at time points
+        expressions = list(tpm.iloc[i,0:(tpm.shape[1]-2)])
+        # Get maximal value for each gene across time points
+        maxTPM = max(expressions)
+        # Get the threshold value
+        thresHold = maxTPM*0.2
+        # get index of time point
+        indices = [x for x in range(len(expressions)) if expressions[x] >= thresHold]
+        # convert index to time point
+        timePoint = timings[min(indices)]
+
+        if timePoint == 0:
+            labels.append('None')
+        elif timePoint < middle:
+            labels.append('early')
+        elif timePoint < late:
+            labels.append('middle')
+        elif timePoint >= late:
+            labels.append('late')
+        else:
+            labels.append('NaN')
+
+        i += 1
+
+    tpmOut = tpm.copy()
+    tpmOut['ClassThreshold'] = labels
+    tpmOut.loc[tpmOut['Entity'] == 'host', 'ClassThreshold'] = 'None'
+
+    return tpmOut
+
+
+# Add a classification label based on maximal expression 
+def classLabelMax(tpm, middle, late):
+    labels = []
+    #extract all measured timings from column names
+    timings = tpm.iloc[:,:-3].columns.astype(float).tolist()
+
+    i = 0
+    while i < tpm.shape[0]:
+        # Get array of expression values at time points
+        expressions = list(tpm.iloc[i,0:(tpm.shape[1]-3)])
+        # Get maximal value for each gene across time points
+        maxTPM = max(expressions)
+        # Get the threshold value
+        thresHold = maxTPM*0.2
+        # get index of time point
+        indices = [x for x in range(len(expressions)) if expressions[x] >= thresHold]
+        # convert index to time point
+        timePoint = timings[min(indices)]
+
+        if timePoint == 0:
+            labels.append('None')
+        elif timePoint < middle:
+            labels.append('early')
+        elif timePoint < late:
+            labels.append('middle')
+        elif timePoint >= late:
+            labels.append('late')
+        else:
+            labels.append('NaN')
+
+        i += 1
+
+    tpmOut = tpm.copy()
+    tpmOut['ClassMax'] = labels
+    tpmOut.loc[tpmOut['Entity'] == 'host', 'ClassMax'] = 'None'
+
+    return tpmOut
