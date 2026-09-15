@@ -3,7 +3,7 @@ process MULTIQC {
     conda "${params.conda_path}/MULTIQC"
 
     tag "multiQC analysis of processes"
-    publishDir "$params.outputDir/multiQC", pattern: "*.html", mode: params.pubDirMode
+    //publishDir "$params.outputDir/multiQC", pattern: "*.html", mode: params.pubDirMode
 
     input:
     path countSummary
@@ -12,7 +12,7 @@ process MULTIQC {
     path fastqc_post
 
     output:
-    path "multiQC_report.html"
+    path "multiQC_report.html", emit: multiqc_r 
 
     script:
     """

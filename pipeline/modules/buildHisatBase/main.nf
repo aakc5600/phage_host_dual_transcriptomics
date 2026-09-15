@@ -5,8 +5,8 @@ Building the HISAT2 base for alignment
 process BUILDHISAT2BASE {
 
     tag "Build dual reference genome and Hisat2Base for alignment"
-    publishDir "$params.outputDir/alignments", pattern: "*.ht2", mode: params.pubDirMode
-    publishDir "$params.outputDir/alignments", pattern: "*.gff3", mode: params.pubDirMode
+    // publishDir "$params.outputDir/alignments", pattern: "*.ht2", mode: params.pubDirMode
+    // publishDir "$params.outputDir/alignments", pattern: "*.gff3", mode: params.pubDirMode
 
     conda "${params.conda_path}/RNASEQ"
 

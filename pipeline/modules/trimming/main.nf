@@ -3,7 +3,7 @@ process TRIM_SE {
     conda "${params.conda_path}/RNASEQ"
 
     tag "Trimming single-end reads via cutadapt $sampleID"
-    publishDir "$params.outputDir/cutadapt", pattern: "*.cutadapt.json", mode: params.pubDirMode
+    //publishDir "$params.outputDir/cutadapt", pattern: "*.cutadapt.json", mode: params.pubDirMode
 
     input:
     tuple val(sampleID), path(reads)
@@ -24,7 +24,7 @@ process TRIM_PE {
     conda "${params.conda_path}/RNASEQ"
 
     tag "Trimming paired-end reads via cutadapt $sampleID"
-    publishDir "$params.outputDir/cutadapt", pattern: "*.cutadapt.json", mode: params.pubDirMode
+    //publishDir "$params.outputDir/cutadapt", pattern: "*.cutadapt.json", mode: params.pubDirMode
 
     input:
     tuple val(sampleID), path(reads)

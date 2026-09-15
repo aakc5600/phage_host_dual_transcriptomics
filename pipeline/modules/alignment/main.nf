@@ -6,7 +6,7 @@ process MAPPINGPE {
     conda "${params.conda_path}/RNASEQ"
 
     tag "Alignment of sample ${sampleID}"
-    publishDir "$params.outputDir/alignments", pattern: "*.hisat2.summary.log", mode: params.pubDirMode
+    //publishDir "$params.outputDir/alignments", pattern: "*.hisat2.summary.log", mode: params.pubDirMode
     
     input:
     val sampleID

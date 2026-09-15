@@ -7,8 +7,8 @@ process FILTERSAMTOBAM {
     conda "${params.conda_path}/RNASEQ"
 
     tag "Processing alignment file ${sampleID}"
-    publishDir "$params.outputDir/alignments", pattern: "*.bam", mode: params.pubDirMode
-    publishDir "$params.outputDir/alignments", pattern: "*.bai", mode: params.pubDirMode
+    //publishDir "$params.outputDir/alignments", pattern: "*.bam", mode: params.pubDirMode
+    //publishDir "$params.outputDir/alignments", pattern: "*.bai", mode: params.pubDirMode
 
     input:
     val sampleID
@@ -34,7 +34,7 @@ process BAMFORCOVERAGE {
     conda "${params.conda_path}/RNASEQ"
 
     tag "Processing bam file for coverage (wiggle files) for ${sampleID}"
-    publishDir "${params.outputDir}/alignments", mode: pubDirMode
+    //publishDir "${params.outputDir}/alignments", mode: pubDirMode
 
     input:
     val sampleID
