@@ -57,6 +57,12 @@ Input can be specified from command line or in /nf/conf/params.config.
 - adapter1, adapter2: by deafult Illumina TruSeq adapter sequences, which can be adjusted, if others used
 - countFeature, featureIdentifier: specify feature to count with using featureCounts and the identifier used from the GFF file
 
+Show help message:
+
+```bash
+nextflow run pipeline --help [--verbose]
+```
+
 Example usage for single-end data:
 
 ```bash
