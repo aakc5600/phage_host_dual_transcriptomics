@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-include { helpMessage; helpMessageVerbose } from './modules/helpMsg'
+include { parseHelp; helpMessage; helpMessageVerbose } from './modules/helpMsg'
 include { FETCHREADS } from './subworkflows/fetchReads'
 include { BUILDHISAT2BASE } from './modules/buildHisatBase'
 include { PROCESSRNASEQ } from './subworkflows/perReadProcessing'
@@ -10,15 +10,7 @@ include { MULTIQC } from './modules/multiQC'
 
 workflow {
     main:
-    if (params.help){
-        if (params.verbose){
-            helpMessageVerbose()
-        }
-        else {
-            helpMessage()
-        }
-        exit 0
-    }
+    parseHelp(params.help, params.verboseHelp)
     
     hisat2 = BUILDHISAT2BASE(params.hostGenome, params.phageGenome, params.hostGFF, params.phageGFF)
     read_pairs_ch = FETCHREADS(params.srrList, params.reads)

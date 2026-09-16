@@ -1,3 +1,14 @@
+def parseHelp(help, verbose) {
+    if (verbose) {
+        helpMessageVerbose()
+        exit 0
+    }
+    if (help) {
+        helpMessage()
+        exit 0
+    }
+}
+
 def helpMessage() {
     log.info"""
     ==-------------------------------------------------------------------==
