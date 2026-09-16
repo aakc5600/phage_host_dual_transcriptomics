@@ -1,73 +1,150 @@
-process fetch_reads_SE {
-    input:
-    each sample
+process GSE_TO_SRA {
+    input :
+    val geo
 
     output:
-    tuple val("${sample}"), path("${sample}.fastq.gz"), emit: read_list
+    path "**.sra"
 
     script:
     """
-    fastq-dump --gzip "${sample}"
+    prefetch $geo
     """
 
     stub:
     """
-    touch "${sample}.fastq.gz"
+    touch placeholder.sra
     """
 }
 
-process fetch_reads_PE {
+process SRA_TO_FASTQ_SE {
     input:
-    each sample
+    path sra
 
     output:
-    tuple val("${sample}"), path("${sample}_{1,2}.fastq.gz"), emit: read_list
+    tuple env('SAMPLE'), path("*.fastq.gz")
 
     script:
     """
-    fastq-dump --gzip --split-3 "${sample}" 
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    fasterq-dump $sra
+    gzip \$SAMPLE.fastq
     """
 
     stub:
     """
-    touch "${sample}_1.fastq.gz" && touch "${sample}_2.fastq.gz"
-    """    
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    touch placeholder.fastq.gz
+    """
 }
+
+process SRA_TO_FASTQ_PE {
+    input:
+    path sra
+
+    output:
+    tuple env('SAMPLE'), path("*_{1,2}.fastq.gz")
+
+    script:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    fasterq-dump $sra
+    find . -name '*.fastq' -exec gzip {} \\;
+    """
+
+    stub:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}    
+    touch placeholder_1.fastq.gz
+    touch placeholder_2.fastq.gz
+    """
+}
+
+process SRA_TO_FASTQ_SE_PIGZ {
+    input:
+    path sra
+
+    output:
+    tuple env('SAMPLE'), path("*.fastq.gz")
+
+    script:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    fasterq-dump $sra
+    pigz \$SAMPLE.fastq
+    """
+
+    stub:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    touch placeholder.fastq.gz
+    """
+}
+
+process SRA_TO_FASTQ_PE_PIGZ {
+    input:
+    path sra
+
+    output:
+    tuple env('SAMPLE'), path("*_{1,2}.fastq.gz")
+
+    script:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    fasterq-dump $sra
+    find . -name "*.fastq" -exec pigz {} \\;
+    """
+
+    stub:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}    
+    touch placeholder_1.fastq.gz
+    touch placeholder_2.fastq.gz
+    """
+}
+
 
 workflow FETCHREADS {
     take:
-    srrList
+    geo
     reads
+    pigz
 
     main:
-
-
-
-
-    if (params.srrList){
-        samples = []
-        count = 0
-        file(srrList).eachLine { line ->
-            samples[count] = line
-            count += 1
-        }
+    if (params.geo) {
+        sra = GSE_TO_SRA(params.geo)
         if (params.pairedEnd) {
-            reads = fetch_reads_PE(samples)
+            if (pigz) {
+                reads = SRA_TO_FASTQ_PE_PIGZ(sra)
+            }
+            else {
+                reads = SRA_TO_FASTQ_PE(sra)
+            }
         }
         else {
-            reads = fetch_reads_SE(samples)
-        }
+            if (pigz) {
+                reads = SRA_TO_FASTQ_SE_PIGZ(sra)
+            }
+            else {
+            reads = SRA_TO_FASTQ_SE(sra)
+            }
+        }        
     }
     else {
         if (params.pairedEnd) {
-            reads = channel.fromFilePairs(reads, size: 2, checkIfExists: true)
+            reads = channel.fromFilePairs(params.reads, size: 2, checkIfExists: true)
         }
         else {
-            read_pairs_ch = channel.fromFilePairs(reads, size: -1, checkIfExists: true)
-        }       
+            reads = channel.fromFilePairs(params.reads, size: -1, checkIfExists: true)
+        }
     }
-
-
 
     emit:
     read_pairs_ch = reads

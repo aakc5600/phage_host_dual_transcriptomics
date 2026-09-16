@@ -17,6 +17,8 @@ This pipeline makes use of the following tools:
 - read mapping (and dual reference genome indexing): hisat2
 - alignment processing: samtools
 - feature counting: featureCounts
+- (optional) fetching reads: prefetch, fasterq-dump from sra-tools
+
 
 
 ### Installation
@@ -43,6 +45,7 @@ Please check that all required packages have been successfully installed in the 
 - cutadapt
 - samtools
 - multiQC (only in MULTIQC env)
+- (sra-tools)
 
 
 ### Input & usage
@@ -60,7 +63,7 @@ Input can be specified from command line or in /nf/conf/params.config.
 Show help message:
 
 ```bash
-nextflow run pipeline --help [--verbose]
+nextflow run pipeline --help [--verboseHelp]
 ```
 
 Example usage for single-end data:

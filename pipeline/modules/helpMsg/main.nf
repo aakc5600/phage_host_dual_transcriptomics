@@ -20,7 +20,7 @@ def helpMessage() {
 
     Arguments:
       --reads                 Path specifying the reads. E.g. ./*_reads.fastq.gz for single-end, or ./*_reads_{1,2}.fastq.gz
-      --srrList               Optional. Overrides --reads. Path specifying a list of SRR numbers to fastq-dump from GEO.
+      --geo                   Optional. Overrides --reads. Path specifying an accession number to fetch from GEO.
 
       --outputDir             Output directory.
       --hostGenome            Host genome path in fasta format.
@@ -52,9 +52,14 @@ def helpMessageVerbose() {
       --reads                 Path specifying the reads. E.g. ./*_reads.fastq.gz for single-end, or ./*_reads_{1,2}.fastq.gz Default is ""/home/$params.user/input/reads/*.fast*"
         [symbols in {} will be used to match paired end read files together. Paired filenames for paired reads must be identical before the {}]
         [Both gzip compressed and raw fastq files can be used]
-      --srrList              Optional. Overrides --reads. Path specifying a list of SRR numbers to fastq-dump from GEO.
+        
+      --geo                   Optional. Overrides --reads. Path specifying an accession number to fetch from GEO.
       [Supports both single-end and paired-end data]
-      [Requires ncbi sra-tools]
+      [Requires ncbi sra-tools to be installed]
+
+      -pigz                   Setting allows use of pigz for gzip op
+      [Requires pigz to be installed]
+
       --outputDir             Output directory.
       --inputDir              Optional. Sets default path for reads and genomes. Default is "/home/$params.user/input"
         [only used if no path for reads or genomes/gffs is provided]
