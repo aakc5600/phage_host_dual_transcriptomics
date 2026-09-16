@@ -11,12 +11,12 @@ include { TRIM_PE } from '../../modules/trimming'
 
 workflow PROCESSRNASEQ {
     take: 
-        reads
+        read_pairs_ch
         alignmentBase
 
     main: 
         if(params.pairedEnd) {
-            read_pairs_ch = channel.fromFilePairs(reads, size: 2, checkIfExists: true)
+            // read_pairs_ch = channel.fromFilePairs(reads, size: 2, checkIfExists: true)
             fastqc_pre = FASTQC_PE(read_pairs_ch)
             TRIM_PE(read_pairs_ch)
             fastqc_post = FASTQCTRIMMED_PE(TRIM_PE.out.sampleID, TRIM_PE.out.trimmedReads)
@@ -25,7 +25,7 @@ workflow PROCESSRNASEQ {
             cutadaptReport = TRIM_PE.out.cutadaptReport
         }
         else {
-            read_pairs_ch = channel.fromFilePairs(reads, size: -1, checkIfExists: true)
+            // read_pairs_ch = channel.fromFilePairs(reads, size: -1, checkIfExists: true)
             fastqc_pre = FASTQC_SE(read_pairs_ch)
             TRIM_SE(read_pairs_ch)
             fastqc_post = FASTQCTRIMMED_SE(TRIM_SE.out.sampleID, TRIM_SE.out.trimmedReads)
