@@ -1,4 +1,9 @@
 process AUTO_PROCESSING {
+
+    conda "${params.conda_path}/RNASEQ"
+
+    tag "Processing $bulkPath, using $sampleDict"
+
     input:
     path bulkPath
     path metaPath

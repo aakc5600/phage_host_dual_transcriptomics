@@ -49,16 +49,13 @@ def helpMessageVerbose() {
     nextflow run rnaseq_workflow.nf --reads '*_{1,2}.fastq.gz' --pairedEnd --hostGenome 'hostGenome.fasta' --hostGFF 'hostGenome.gff' --phageGenome 'phageGenome.fasta' --phageGFF 'phageGenome.gff3'
 
     Arguments:
-      --reads                 Path specifying the reads. E.g. ./*_reads.fastq.gz for single-end, or ./*_reads_{1,2}.fastq.gz Default is ""/home/$params.user/input/reads/*.fast*"
+      --reads                 Path specifying the reads. E.g. ./*_reads.fastq.gz for single-end, or ./*_reads_{1,2}.fastq.gz Default is "/home/$params.user/input/reads/*.fast*"
         [symbols in {} will be used to match paired end read files together. Paired filenames for paired reads must be identical before the {}]
         [Both gzip compressed and raw fastq files can be used]
         
       --geo                   Optional. Overrides --reads. Path specifying an accession number to fetch from GEO.
       [Supports both single-end and paired-end data]
       [Requires ncbi sra-tools to be installed]
-
-      -pigz                   Setting allows use of pigz for gzip op
-      [Requires pigz to be installed]
 
       --outputDir             Output directory.
       --inputDir              Optional. Sets default path for reads and genomes. Default is "/home/$params.user/input"
@@ -78,6 +75,16 @@ def helpMessageVerbose() {
 
       --conda_path            Default is "/home/$params.user/miniconda3/envs"
         [Path to environments folder for your install of conda]
+
+      --auto                  If true, downstream analysis will be automatically started
+      [requires metaPath and sampleDict to be set]
+      [Samples are treated as single dataset. Different treatments (eg. +- antibiotic) are not automatically parsed]
+      [If further parsing of data is required, downstream analysis has to be carried out manually via the provided jupyter notebook]
+      
+      --sampleDict            Dictionary-like string denoting which SRR number corresponds to which sample for downstream analysis
+      [Format must be '[SRR-number]:[timepoint_reapeat], [SRR-number]:[timepoint_reapeat], etc.'     eg. see ./conf/params.config]
+
+      --metaPath              sraRunTable.csv to use for downstream processing. Default is "/home/$params.user/input/metadata/sraRunTable.csv"
 
     Arguments can also be set in the config file (./conf/params.config)
     """.stripIndent()
