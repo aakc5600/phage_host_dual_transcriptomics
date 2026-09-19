@@ -311,3 +311,10 @@ def findEntity(df):
     host = df[0].value_counts().index.values[0]
     phage = df[0].value_counts().index.values[1]
     return { host : 'host', phage : 'phage'}
+
+def parseDict(string):
+    lis = string.split(', ')
+    dic = {}
+    for i in lis:
+        dic[i.split(':')[0]] = i.split(':')[1]
+    return dic

@@ -7,6 +7,7 @@ include { PROCESSRNASEQ } from './subworkflows/perReadProcessing'
 include { FEATURECOUNTS } from './modules/readCounting'
 include { CLEANUP } from './modules/cleanDir'
 include { MULTIQC } from './modules/multiQC'
+include { AUTO_PROCESSING } from './modules/downstreamProcessing'
 
 workflow {
     main:
@@ -16,6 +17,9 @@ workflow {
     rnaseq = PROCESSRNASEQ(read_pairs_ch, BUILDHISAT2BASE.out.alignmentBase)
     featurecounts = FEATURECOUNTS(PROCESSRNASEQ.out.sortedBamFile.collect(), BUILDHISAT2BASE.out.dualGFF)
     multiqc = MULTIQC(FEATURECOUNTS.out.countSummary, PROCESSRNASEQ.out.cutadaptReport.collect().ifEmpty([]), PROCESSRNASEQ.out.fastqc_pre.collect(), PROCESSRNASEQ.out.fastqc_post.collect())    
+    if ( params.auto ) {
+        processing = AUTO_PROCESSING(featurecounts.countTable, params.metaPath, rnaseq.dualGFF, params.sampleDict, params.tools)
+    }
 
     publish:
     // This looks so ugly, but idk if there's a nicer way 
@@ -34,6 +38,8 @@ workflow {
     countSummary = featurecounts.countSummary
 
     multiqc_r = multiqc.multiqc_r
+
+    downstream = processing.analysis
 }
 // pooling the outputs by module/subworkflow of origin
 output {
@@ -51,4 +57,6 @@ output {
     countSummary{ path "featurecounts"}
 
     multiqc_r{ path "multiqc"}
+
+    downstream{path "downstream"}
 }
