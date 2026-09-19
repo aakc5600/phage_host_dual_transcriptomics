@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.decomposition import PCA
+import re
 
 
 # Adding annotation to metadata, matching samples in raw counts table
@@ -283,3 +284,30 @@ def classLabelMax(tpm, middle, late):
     tpmOut.loc[tpmOut['Entity'] == 'host', 'ClassMax'] = 'None'
 
     return tpmOut
+
+# returns the times at the start of column names skipping non-sample columns
+def findTimes(df):
+    cols = df.columns.values
+    lis = []
+    for i in cols:
+        m = re.match(r"(\d*)", i).group()
+        if m:
+            lis.append(m)
+    return lis
+
+# Find how many rows to skip by assuming the first row that has a tab should not be skipped
+def findRow(path):
+    with open(path) as file:
+        countrows = 0
+        for row in file:
+            countrows = countrows + 1
+            if ( "\t" in row ):
+                return countrows-1
+            else:
+                return 5
+
+# Automatically find which string corresponds to host and phage genome by frequency in gff
+def findEntity(df):
+    host = df[0].value_counts().index.values[0]
+    phage = df[0].value_counts().index.values[1]
+    return { host : 'host', phage : 'phage'}
