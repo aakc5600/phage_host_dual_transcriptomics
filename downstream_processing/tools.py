@@ -303,8 +303,7 @@ def findRow(path):
             countrows = countrows + 1
             if ( "\t" in row ):
                 return countrows-1
-            else:
-                return 5
+        return 5
 
 # Automatically find which string corresponds to host and phage genome by frequency in gff
 def findEntity(df):

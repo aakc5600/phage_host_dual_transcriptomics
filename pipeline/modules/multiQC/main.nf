@@ -18,4 +18,9 @@ process MULTIQC {
     """
     multiqc . -n multiQC_report.html --no-data-dir -m custom_content -m preseq -m rseqc -m featurecounts -m star -m cutadapt -m fastqc -m qualimap -m salmon
     """
+
+    stub:
+    """
+    touch multiQC_report.html
+    """
 }

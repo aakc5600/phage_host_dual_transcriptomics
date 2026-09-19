@@ -26,6 +26,12 @@ process FILTERSAMTOBAM {
     samtools index ${sampleID}_sorted.bam  
     """
 
+    stub:
+    """
+    touch ${sampleID}_sorted.bam
+    touch ${sampleID}_sorted.bam.bai
+    """
+
 }
 
 
@@ -48,6 +54,11 @@ process BAMFORCOVERAGE {
     """
     samtools view -b $sortedBamFile Chr > ${sampleID}_Chr.bam
     samtools view -F 256 ${sampleID}_Chr.bam > ${sampleID}_Chr_primary.bam
+    """
+
+    stub:
+    """
+    touch ${sampleID}_Chr_primary.bam
     """
 
 }

@@ -1,6 +1,6 @@
 process AUTO_PROCESSING {
 
-    conda "${params.conda_path}/RNASEQ"
+    conda "${params.conda_path}/DOWNSTREAM"
 
     tag "Processing $bulkPath, using $sampleDict"
 
@@ -23,7 +23,7 @@ process AUTO_PROCESSING {
     import matplotlib.pyplot as plt
     import seaborn as sns
     from sklearn.decomposition import PCA
-    from $tools import *
+    from tools import *
     import re
 
 
@@ -52,7 +52,7 @@ process AUTO_PROCESSING {
                 'GSM6447620': '4_R1', 'GSM6447621': '4_R2', 'GSM6447622': '4_R3', 'GSM6447623': '7_R1', 'GSM6447624': '7_R2', 'GSM6447625': '7_R3',
                 'GSM6447626': '20_R1', 'GSM6447627': '20_R2', 'GSM6447628': '20_R3'}
 
-    sampleDict = parseDict(${sampleDict})
+    sampleDict = parseDict('${sampleDict}')
 
     # Update metadata dataframe
     metadataFull = annotateData(metadata, sampleDict)

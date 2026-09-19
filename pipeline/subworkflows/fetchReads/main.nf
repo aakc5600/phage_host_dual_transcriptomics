@@ -1,4 +1,4 @@
-/*process GSE_TO_SRA {
+process GSE_TO_SRA {
     input :
     val geo
 
@@ -16,7 +16,7 @@
     """
 }
 
-process SRA_TO_FASTQ_SE {
+/*process SRA_TO_FASTQ_SE {
     input:
     path sra
 
@@ -112,7 +112,7 @@ process SRA_TO_FASTQ_PE_PIGZ {
 */
 
 process SRA_TO_FASTQ {
-    tag "fetching $geo"
+    tag "fetching $params.geo"
     
     input:
     path sra

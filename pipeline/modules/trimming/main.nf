@@ -17,6 +17,12 @@ process TRIM_SE {
     """
     cutadapt -a $params.adapter1 -g $params.adapter2 --json=${sampleID}.cutadapt.json -q 28 --quality-base 33 -o ${sampleID}_trimmed.fastq $reads
     """
+
+    stub:
+    """
+    touch ${sampleID}_trimmed.fastq
+    touch ${sampleID}.cutadapt.json
+    """
 }
 
 process TRIM_PE {
@@ -37,5 +43,11 @@ process TRIM_PE {
     script:
     """
     cutadapt -a $params.adapter1 -A $params.adapter2 --json=${sampleID}.cutadapt.json -q 28 --quality-base 33 -o ${sampleID}_trimmed_R1.fastq -p ${sampleID}_trimmed_R2.fastq $reads
+    """
+
+stub:
+    """
+    touch ${sampleID}_trimmed.fastq
+    touch ${sampleID}.cutadapt.json
     """
 }

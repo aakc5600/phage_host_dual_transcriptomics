@@ -18,7 +18,7 @@ workflow {
     featurecounts = FEATURECOUNTS(PROCESSRNASEQ.out.sortedBamFile.collect(), BUILDHISAT2BASE.out.dualGFF)
     multiqc = MULTIQC(FEATURECOUNTS.out.countSummary, PROCESSRNASEQ.out.cutadaptReport.collect().ifEmpty([]), PROCESSRNASEQ.out.fastqc_pre.collect(), PROCESSRNASEQ.out.fastqc_post.collect())    
     if ( params.auto ) {
-        processing = AUTO_PROCESSING(featurecounts.countTable, params.metaPath, rnaseq.dualGFF, params.sampleDict, params.tools)
+        processing = AUTO_PROCESSING(featurecounts.countTable, params.metaPath, hisat2.dualGFF, params.sampleDict, params.tools)
     }
 
     publish:

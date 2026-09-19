@@ -22,6 +22,15 @@ process FASTQCTRIMMED_PE {
     fastqc -o fastqc_trimmed_${sampleID}_1 -q ${trimmedReads[0]}
     fastqc -o fastqc_trimmed_${sampleID}_2 -q ${trimmedReads[1]}
     """
+
+    stub:
+    """
+    mkdir fastqc_trimmed_${sampleID}_1
+    mkdir fastqc_trimmed_${sampleID}_2
+    touch fastqc_trimmed_${sampleID}_1/fastqc_trimmed_${sampleID}_1
+    touch fastqc_trimmed_${sampleID}_2/fastqc_trimmed_${sampleID}_2
+    """
+
 }
 
 
@@ -43,5 +52,11 @@ process FASTQCTRIMMED_SE {
     """
     mkdir fastqc_trimmed_${sampleID}_1
     fastqc -o fastqc_trimmed_${sampleID}_1 -q ${trimmedReads[0]}
+    """
+
+    stub:
+    """
+    mkdir fastqc_trimmed_${sampleID}_1
+    touch fastqc_trimmed_${sampleID}_1/fastqc_trimmed_${sampleID}_1
     """
 }

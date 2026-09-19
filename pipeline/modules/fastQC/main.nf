@@ -21,6 +21,14 @@ process FASTQC_PE {
     fastqc -o fastqc_${sample_id}_1 -q ${reads[0]}
     fastqc -o fastqc_${sample_id}_2 -q ${reads[1]}
     """
+
+    stub:
+    """
+    mkdir fastqc_${sample_id}_1
+    mkdir fastqc_${sample_id}_2
+    touch fastqc_${sample_id}_1/fastqc_${sample_id}_1
+    touch fastqc_${sample_id}_2/fastqc_${sample_id}_2
+    """
 }
 
 process FASTQC_SE {
@@ -40,5 +48,11 @@ process FASTQC_SE {
     """
     mkdir fastqc_${sample_id}_1
     fastqc -o fastqc_${sample_id}_1 -q ${reads[0]}
+    """
+
+    stub:
+    """
+    mkdir fastqc_${sample_id}_1
+    touch fastqc_${sample_id}_1/fastqc_${sample_id}_1
     """
 }

@@ -26,4 +26,9 @@ process FEATURECOUNTS {
     $sortedBamFiles
     """
 
+    stub:
+    """
+    touch countData.tsv
+    touch countData.tsv.summary
+    """
 }

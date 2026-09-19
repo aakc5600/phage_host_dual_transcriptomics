@@ -26,6 +26,12 @@ process MAPPINGPE {
     --summary-file ${sampleID}.hisat2.summary.log \\
     -S ${sampleID}.sam
     """
+
+    stub:
+    """
+    touch ${sampleID}.sam
+    touch ${sampleID}.hisat2.summary.log
+    """
 }
 
 process MAPPINGSE {
@@ -50,5 +56,11 @@ process MAPPINGSE {
     -U $trimmedReads \\
     --summary-file ${sampleID}.hisat2.summary.log \\
     -S ${sampleID}.sam
+    """
+
+    stub:
+    """
+    touch ${sampleID}.sam
+    touch ${sampleID}.hisat2.summary.log  
     """
 }
