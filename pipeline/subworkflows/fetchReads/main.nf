@@ -1,4 +1,4 @@
-process GSE_TO_SRA {
+/*process GSE_TO_SRA {
     input :
     val geo
 
@@ -109,33 +109,71 @@ process SRA_TO_FASTQ_PE_PIGZ {
     touch placeholder_2.fastq.gz
     """
 }
+*/
+
+process SRA_TO_FASTQ {
+    tag "fetching $geo"
+    
+    input:
+    path sra
+
+    output:
+    tuple env('SAMPLE'), path("*[0-9][0-9].fastq.gz"), emit: singles, optional: true
+    tuple env('SAMPLE'), path("*_{1,2}.fastq.gz"), emit: pairs, optional: true
+    
+    script:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    fasterq-dump $sra
+    find . -name "*.fastq" -exec sh -c 'pigz {} || gzip {}' \\;
+    """
+
+    stub:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}    
+    touch placeholder_1.fastq.gz
+    touch placeholder_2.fastq.gz
+    """
+}
 
 
 workflow FETCHREADS {
     take:
     geo
     reads
-    pigz
+    // pigz
 
     main:
     if (params.geo) {
         sra = GSE_TO_SRA(params.geo)
+        fastq = SRA_TO_FASTQ(sra)
+        fastq.singles.view()
+        fastq.pairs.view()
         if (params.pairedEnd) {
-            if (pigz) {
-                reads = SRA_TO_FASTQ_PE_PIGZ(sra)
-            }
-            else {
-                reads = SRA_TO_FASTQ_PE(sra)
-            }
+            reads = fastq.pairs
         }
         else {
-            if (pigz) {
-                reads = SRA_TO_FASTQ_SE_PIGZ(sra)
-            }
-            else {
-            reads = SRA_TO_FASTQ_SE(sra)
-            }
-        }        
+            reads = fastq.singles
+        }
+        
+        // if (params.pairedEnd) {
+        //     if (pigz) {
+        //         reads = SRA_TO_FASTQ_PE_PIGZ(sra)
+        //     }
+        //     else {
+        //         reads = SRA_TO_FASTQ_PE(sra)
+        //     }
+        // }
+        // else {
+        //     if (pigz) {
+        //         reads = SRA_TO_FASTQ_SE_PIGZ(sra)
+        //     }
+        //     else {
+        //     reads = SRA_TO_FASTQ_SE(sra)
+        //     }
+        // }        
     }
     else {
         if (params.pairedEnd) {
