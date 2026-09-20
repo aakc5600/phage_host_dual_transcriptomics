@@ -10,6 +10,8 @@ process AUTO_PROCESSING {
     path gffPath
     val sampleDict
     path tools
+    val middle
+    val late
 
     output:
     path "*.tsv", emit: analysis
@@ -262,15 +264,16 @@ process AUTO_PROCESSING {
     # 
     # Timepoint boundaries for classification can chosen based on the given data as well as already known criteria. They are hardcoded into the classification functions:
     # 
-    # - Early genes: Meet the classification criteria at timepoints 1 or 4
-    # - Middle genes: Meet the classification criteria at timepoint 7
-    # - Late genes: Meet the classification criteria at timepoint 20
+    # - Early genes: Meet the classification criteria before timepoints $early
+    # - Middle genes: Meet the classification criteria after timepoint $middle
+    # - Late genes: Meet the classification criteria after timepoint $late
     # 
     # One may need to add more conditions, if more timepoints are available.
-
+    middle = float($middle)
+    late = float($late)
     # Classify phage genes according to set timepoints in the respective functions
-    TPMmeans = classLabelThreshold(TPMmeans,5,10)
-    TPMmeans = classLabelMax(TPMmeans,5,10)
+    TPMmeans = classLabelThreshold(TPMmeans,middle,late)
+    TPMmeans = classLabelMax(TPMmeans,middle,late)
 
     TPMmeans[TPMmeans["Entity"] == "phage"].head(2)
 
