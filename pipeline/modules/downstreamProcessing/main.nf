@@ -264,7 +264,7 @@ process AUTO_PROCESSING {
     # 
     # Timepoint boundaries for classification can chosen based on the given data as well as already known criteria. They are hardcoded into the classification functions:
     # 
-    # - Early genes: Meet the classification criteria before timepoints $early
+    # - Early genes: Meet the classification criteria before timepoints $middle
     # - Middle genes: Meet the classification criteria after timepoint $middle
     # - Late genes: Meet the classification criteria after timepoint $late
     # 

@@ -2,3 +2,4 @@
 /results/
 /.nextflow/
 .nextflow.log*
+/input/*/
