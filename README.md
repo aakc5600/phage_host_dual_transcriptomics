@@ -28,7 +28,7 @@ Installation of conda environments from file:
 ```bash
 conda env create -f /env/RNASEQ.yml
 conda env create -f /env/MULTIQC.yml
-conda env create -f /env/DOWNSTREAM.yml
+conda env create -f /env/DOWNSTREAM.yml # used only for automated/manual downstream processing
 ```
 
 or, when using mamba:
@@ -36,7 +36,7 @@ or, when using mamba:
 ```bash
 mamba env create -f /env/RNASEQ.yml
 mamba env create -f /env/MULTIQC.yml
-conda env create -f /env/DOWNSTREAM.yml
+mamba env create -f /env/DOWNSTREAM.yml # used only for automated/manual downstream processing
 ```
 
 Also, check if Nextflow is available, otherwise install manually. (should by default be installed in RNASEQ environment)
@@ -49,7 +49,7 @@ Please check that all required packages have been successfully installed in the 
 - multiQC (only in MULTIQC env)
 
 Optional system wide packages:
-- sra-tools (required if fetching reads from GEO) 
+- sra-toolkit (required if fetching reads from GEO) 
 - pigz  (Multicore replacement for gzip, reccommended if fetching reads from GEO)
 
 ### Input & usage
