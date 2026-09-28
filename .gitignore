@@ -2,4 +2,5 @@
 /results/
 /.nextflow/
 .nextflow.log*
-/input/*/
+/input/*
+/phx/*

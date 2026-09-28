@@ -1,4 +1,7 @@
 process GSE_TO_SRA {
+
+    conda "${params.conda_path}/SRATOOLS"
+
     input :
     val geo
 
@@ -16,7 +19,8 @@ process GSE_TO_SRA {
     """
 }
 
-/*process SRA_TO_FASTQ_SE {
+/*Obsolete versions of the fetching processes
+process SRA_TO_FASTQ_SE {
     input:
     path sra
 
@@ -112,6 +116,9 @@ process SRA_TO_FASTQ_PE_PIGZ {
 */
 
 process SRA_TO_FASTQ {
+
+    conda "${params.conda_path}/SRATOOLS"
+
     tag "fetching $params.geo"
     
     input:

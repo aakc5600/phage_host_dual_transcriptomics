@@ -26,17 +26,29 @@ This pipeline makes use of the following tools:
 Installation of conda environments from file:
 
 ```bash
-conda env create -f /env/RNASEQ.yml
-conda env create -f /env/MULTIQC.yml
-conda env create -f /env/DOWNSTREAM.yml # used only for automated/manual downstream processing
+conda env create -f ./env/RNASEQ.yml
+conda env create -f ./env/MULTIQC.yml
+
+conda env create -f ./env/SRATOOLS.yml # Optional: Used only for fetching reads from GEO (can also be installed as a system-wide package)
+
+conda env create -f ./env/DOWNSTREAM.yml # Optional: used only for automated/manual downstream processing
+conda env create -f ./env/PHAROKKA.yml # Optional: used only for automated annotation via pharokka
+conda env create -f ./env/PHOLD.yml # Optional: used only for automated annotation via phold
+conda env create -f ./env/PHYNTENY.yml # Optional: used only for automated annotation via phynteny
 ```
 
 or, when using mamba:
 
 ```bash
-mamba env create -f /env/RNASEQ.yml
-mamba env create -f /env/MULTIQC.yml
-mamba env create -f /env/DOWNSTREAM.yml # used only for automated/manual downstream processing
+mamba env create -f ./env/RNASEQ.yml
+mamba env create -f ./env/MULTIQC.yml
+
+mamba env create -f ./env/SRATOOLS.yml # Optional: Used only for fetching reads from GEO (can also be installed as a system-wide package)
+
+mamba env create -f ./env/DOWNSTREAM.yml # Optional: used only for automated/manual downstream processing
+mamba env create -f ./env/PHAROKKA.yml # Optional: used only for automated annotation via pharokka (and phold and phynteny)
+mamba env create -f ./env/PHOLD.yml # Optional: used only for automated annotation via phold (and phynteny)
+mamba env create -f ./env/PHYNTENY.yml # Optional: used only for automated annotation via phynteny
 ```
 
 Also, check if Nextflow is available, otherwise install manually. (should by default be installed in RNASEQ environment)
@@ -48,9 +60,22 @@ Please check that all required packages have been successfully installed in the 
 - samtools
 - multiQC (only in MULTIQC env)
 
-Optional system wide packages:
-- sra-toolkit (required if fetching reads from GEO) 
-- pigz  (Multicore replacement for gzip, reccommended if fetching reads from GEO)
+Optional system-wide packages:
+- pigz (Multicore replacement for gzip, recommended, but not required, if fetching reads from GEO)
+
+Quick-installation of databases and models for optional PHROG annotation tools (visit the relevant github page for each tool for instructions on advanced usage/GPU usage):
+
+```bash
+cd phage_host_dual_transcriptomics/
+conda activate pharokka
+pharokka install -o phx/pharokka_db
+
+conda activate pholdENV
+phold install -d phx/phold_db
+
+conda activate phynteny_transformer
+install_models -o phx/phynteny_models
+```
 
 ### Input & usage
 
