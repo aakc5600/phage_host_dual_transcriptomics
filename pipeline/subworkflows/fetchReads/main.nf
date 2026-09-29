@@ -153,8 +153,8 @@ workflow FETCHREADS {
     // pigz
 
     main:
-    if (params.geo) {
-        sra = GSE_TO_SRA(params.geo)
+    if ( geo != "false" ) {
+        sra = GSE_TO_SRA(geo)
         fastq = SRA_TO_FASTQ(sra)
         fastq.singles.view()
         fastq.pairs.view()
@@ -184,10 +184,10 @@ workflow FETCHREADS {
     }
     else {
         if (params.pairedEnd) {
-            reads = channel.fromFilePairs(params.reads, size: 2, checkIfExists: true)
+            reads = channel.fromFilePairs(reads, size: 2, checkIfExists: true)
         }
         else {
-            reads = channel.fromFilePairs(params.reads, size: -1, checkIfExists: true)
+            reads = channel.fromFilePairs(reads, size: -1, checkIfExists: true)
         }
     }
 

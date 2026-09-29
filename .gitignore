@@ -4,3 +4,4 @@
 .nextflow.log*
 /input/*
 /phx/*
+/downstream_processing/outdated/

@@ -15,7 +15,7 @@ process ANNOTATE_PHA {
 
     script:
     """
-    pharokka run $db -t $threads -i '$fasta' -o pharokka
+    pharokka run -d $db -t $threads -i '$fasta' -o pharokka
     """
 }
 
@@ -24,7 +24,7 @@ process ANNOTATE_PHO {
 
     conda "${params.conda_path}/pholdENV"
 
-    tag "Annotating $fasta, using Phold on $threads threads"
+    tag "Annotating $gbk, using Phold on $threads threads"
 
     input:
     path gbk
@@ -36,7 +36,7 @@ process ANNOTATE_PHO {
 
     script:
     """
-    phold run $db -t $thread --i '$gbk' -o phold
+    phold run -d $db -t $threads --i '$gbk' -o phold
     """
 }
 
@@ -45,7 +45,7 @@ process ANNOTATE_PHY {
 
     conda "${params.conda_path}/phynteny_transformer"
     
-    tag "Annotating $fasta, using Phynteny"
+    tag "Annotating $gbk, using Phynteny"
 
     input:
     path gbk
@@ -56,7 +56,7 @@ process ANNOTATE_PHY {
 
     script:
     """
-    phynteny_transformer $model -o phynteny '$gbk'
+    phynteny_transformer -m $model -o phynteny '$gbk'
     """
 }
 

@@ -8,6 +8,16 @@ def parseHelp(help, verbose) {
         exit 0
     }
 }
+def checkDict(auto, dict) {
+  if ( params.auto ) {
+    if ( params.sampleDict == "false" ) {
+        log.info"""
+        When attempting automatic downstream processing, sampleDict must be set. Run "nextflow run pipeline --verboseHelp" for more information or check conf/params.config for an example
+        """.stripIndent()
+        exit 0
+    }
+  }
+}
 
 def helpMessage() {
     log.info"""

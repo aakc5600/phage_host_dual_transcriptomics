@@ -1,0 +1,144 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com///nextflow_schema.json",
+  "title": " pipeline parameters",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "sampleDict": {
+      "type": "string",
+      "pattern": "^(false)$|^((?:GSM\\d*:\\d*_\\w*, )*(?:GSM\\d*:\\d*_\\w*))?$"
+    },
+    "pwd": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline",
+      "format": "directory-path"
+    },
+    "hostGenome": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.fna"
+    },
+    "phageGenome": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.fna"
+    },
+    "hostGFF": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.gff"
+    },
+    "phageGFF": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.gff"
+    },
+    "pairedEnd": {
+      "type": "boolean"
+    },
+    "geo": {
+      "type": "string",
+      "pattern": "^(false)$|^(\\w{3,5}\\d{5,9})$"
+    },
+    "reads": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/reads/*.fastq.gz"
+    },
+    "outputDir": {
+      "type": "string",
+      "default": "/output"
+    },
+    "adapter1": {
+      "type": "string",
+      "default": "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+    },
+    "adapter2": {
+      "type": "string",
+      "default": "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
+    },
+    "countFeature": {
+      "type": "string",
+      "default": "gene"
+    },
+    "featureIdentifier": {
+      "type": "string",
+      "default": "ID"
+    },
+    "verboseHelp": {
+      "type": "boolean"
+    },
+    "auto": {
+      "type": "boolean"
+    },
+    "tools": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/downstream_processing/tools.py"
+    },
+    "metaPath": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/metadata/SraRunTable.csv"
+    },
+    "timeStart": {
+      "type": "integer",
+      "default": 0
+    },
+    "timeEnd": {
+      "type": "integer",
+      "default": 20
+    },
+    "timeUntilMiddle": {
+      "type": "integer",
+      "default": 5
+    },
+    "timeUntilLate": {
+      "type": "integer",
+      "default": 10
+    },
+    "gbkPath": {
+      "type": "string",
+      "pattern": "^(false)$|^(.*\\.gbk)$"
+    },
+    "pharokka": {
+      "type": "boolean"
+    },
+    "phold": {
+      "type": "boolean"
+    },
+    "phynteny": {
+      "type": "boolean"
+    },
+    "phxThreads": {
+      "type": "integer",
+      "default": 16
+    },
+    "pha_db": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/phx/pharokka_db"
+    },
+    "pho_db": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/phx/phold_db"
+    },
+    "phy_model": {
+      "type": "string",
+      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/phx/phynteny_models"
+    },
+    "user": {
+      "type": "string",
+      "default": "mangl"
+    },
+    "conda_path": {
+      "type": "string",
+      "default": "/home/mangl/miniconda3/envs",
+      "pattern": "/envs"
+    }
+  },
+  "required": [
+    "hostGenome",
+    "phageGenome",
+    "hostGFF",
+    "phageGFF",
+    "adapter1",
+    "adapter2",
+    "countFeature",
+    "featureIdentifier",
+    "conda_path"
+  ]
+}
