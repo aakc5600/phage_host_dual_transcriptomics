@@ -90,6 +90,7 @@ process AUTO_PROCESSING {
     from sklearn.decomposition import PCA
     from tools import *
     import re
+    import argparse
 
 
     # ## 1 Load the dataset and annotation
@@ -102,6 +103,8 @@ process AUTO_PROCESSING {
     metaPath = '$metaPath'
     # Concatenated phage/host gff3 file, output from nextflow pipeline
     gffPath = '$gffPath'
+
+    parser = argpa
 
     # Load data as pandas dataframe
     df_initial = pd.read_csv(bulkPath, sep = '\\t', comment='#', index_col=0)

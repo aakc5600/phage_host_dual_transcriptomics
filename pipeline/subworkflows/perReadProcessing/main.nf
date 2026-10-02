@@ -13,6 +13,8 @@ workflow PROCESSRNASEQ {
     take: 
         read_pairs_ch
         alignmentBase
+        threads
+        mem
 
     main: 
         if(params.pairedEnd) {
@@ -21,7 +23,7 @@ workflow PROCESSRNASEQ {
             TRIM_PE(read_pairs_ch)
             fastqc_post = FASTQCTRIMMED_PE(TRIM_PE.out.sampleID, TRIM_PE.out.trimmedReads)
             MAPPINGPE(TRIM_PE.out.sampleID, TRIM_PE.out.trimmedReads, alignmentBase)
-            FILTERSAMTOBAM(MAPPINGPE.out.sampleID, MAPPINGPE.out.samFile)
+            FILTERSAMTOBAM(MAPPINGPE.out.sampleID, MAPPINGPE.out.samFile, threads, mem)
             cutadaptReport = TRIM_PE.out.cutadaptReport
         }
         else {
@@ -30,7 +32,7 @@ workflow PROCESSRNASEQ {
             TRIM_SE(read_pairs_ch)
             fastqc_post = FASTQCTRIMMED_SE(TRIM_SE.out.sampleID, TRIM_SE.out.trimmedReads)
             MAPPINGSE(TRIM_SE.out.sampleID, TRIM_SE.out.trimmedReads, alignmentBase)
-            FILTERSAMTOBAM(MAPPINGSE.out.sampleID, MAPPINGSE.out.samFile)
+            FILTERSAMTOBAM(MAPPINGSE.out.sampleID, MAPPINGSE.out.samFile, threads, mem)
             cutadaptReport = TRIM_SE.out.cutadaptReport
         }
 
@@ -40,6 +42,4 @@ workflow PROCESSRNASEQ {
         cutadaptReport = cutadaptReport
         fastqc_pre = fastqc_pre
         fastqc_post = fastqc_post
-        // fastqc_pre = FASTQC.out.fastqc_pre
-        // fastqc_post = FASTQCTRIMMED.out.fastqc_post
 }

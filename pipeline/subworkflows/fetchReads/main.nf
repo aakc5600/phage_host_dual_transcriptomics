@@ -19,102 +19,6 @@ process GSE_TO_SRA {
     """
 }
 
-/*Obsolete versions of the fetching processes
-process SRA_TO_FASTQ_SE {
-    input:
-    path sra
-
-    output:
-    tuple env('SAMPLE'), path("*.fastq.gz")
-
-    script:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}
-    fasterq-dump $sra
-    gzip \$SAMPLE.fastq
-    """
-
-    stub:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}
-    touch placeholder.fastq.gz
-    """
-}
-
-process SRA_TO_FASTQ_PE {
-    input:
-    path sra
-
-    output:
-    tuple env('SAMPLE'), path("*_{1,2}.fastq.gz")
-
-    script:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}
-    fasterq-dump $sra
-    find . -name '*.fastq' -exec gzip {} \\;
-    """
-
-    stub:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}    
-    touch placeholder_1.fastq.gz
-    touch placeholder_2.fastq.gz
-    """
-}
-
-process SRA_TO_FASTQ_SE_PIGZ {
-    input:
-    path sra
-
-    output:
-    tuple env('SAMPLE'), path("*.fastq.gz")
-
-    script:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}
-    fasterq-dump $sra
-    pigz \$SAMPLE.fastq
-    """
-
-    stub:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}
-    touch placeholder.fastq.gz
-    """
-}
-
-process SRA_TO_FASTQ_PE_PIGZ {
-    input:
-    path sra
-
-    output:
-    tuple env('SAMPLE'), path("*_{1,2}.fastq.gz")
-
-    script:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}
-    fasterq-dump $sra
-    find . -name "*.fastq" -exec pigz {} \\;
-    """
-
-    stub:
-    """
-    SRA=$sra
-    SAMPLE=\${SRA%%.sra}    
-    touch placeholder_1.fastq.gz
-    touch placeholder_2.fastq.gz
-    """
-}
-*/
-
 process SRA_TO_FASTQ {
 
     conda "${params.conda_path}/SRATOOLS"
@@ -140,8 +44,8 @@ process SRA_TO_FASTQ {
     """
     SRA=$sra
     SAMPLE=\${SRA%%.sra}    
-    touch placeholder_1.fastq.gz
-    touch placeholder_2.fastq.gz
+    touch \${SAMPLE}_STUB_1.fastq.gz
+    touch \${SAMPLE}_STUB_2.fastq.gz
     """
 }
 
@@ -165,24 +69,7 @@ workflow FETCHREADS {
         }
         else {
             reads = fastq.singles
-        }
-        
-        // if (params.pairedEnd) {
-        //     if (pigz) {
-        //         reads = SRA_TO_FASTQ_PE_PIGZ(sra)
-        //     }
-        //     else {
-        //         reads = SRA_TO_FASTQ_PE(sra)
-        //     }
-        // }
-        // else {
-        //     if (pigz) {
-        //         reads = SRA_TO_FASTQ_SE_PIGZ(sra)
-        //     }
-        //     else {
-        //     reads = SRA_TO_FASTQ_SE(sra)
-        //     }
-        // }        
+        } 
     }
     else {
         if (params.pairedEnd) {

@@ -11,6 +11,7 @@ process FEATURECOUNTS {
     input:
     path sortedBamFiles
     path inputGFF
+    val threads
 
     output:
     path "countData.tsv", emit: countTable
@@ -19,7 +20,7 @@ process FEATURECOUNTS {
     script:
     """
     featureCounts -p -M -O --primary \\
-    -T 20 \\
+    -T $threads \\
     -a $inputGFF \\
     -t $params.countFeature \\
     -o countData.tsv \\

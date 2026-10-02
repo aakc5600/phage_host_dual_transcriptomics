@@ -16,19 +16,23 @@
     },
     "hostGenome": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.fna"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.fna",
+      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "phageGenome": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.fna"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.fna",
+      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "hostGFF": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.gff"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.gff",
+      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "phageGFF": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.gff"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.gff",
+      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "pairedEnd": {
       "type": "boolean"
@@ -39,7 +43,8 @@
     },
     "reads": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/reads/*.fastq.gz"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/reads/*.fastq.gz",
+      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "outputDir": {
       "type": "string",
@@ -69,11 +74,12 @@
     },
     "tools": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/downstream_processing/tools.py"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/downstream_processing/tools.py",
+      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "metaPath": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/metadata/SraRunTable.csv"
+      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "timeStart": {
       "type": "integer",
@@ -104,21 +110,17 @@
     "phynteny": {
       "type": "boolean"
     },
-    "phxThreads": {
-      "type": "integer",
-      "default": 16
-    },
     "pha_db": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/phx/pharokka_db"
+      "pattern": "^(false)$|^((\\/[\\w\\*\\.]+)+\\/?)$"
     },
     "pho_db": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/phx/phold_db"
+      "pattern": "^(false)$|^((\\/[\\w\\*\\.]+)+\\/?)$"
     },
     "phy_model": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/phx/phynteny_models"
+      "pattern": "^(false)$|^((\\/[\\w\\*\\.]+)+\\/?)$"
     },
     "user": {
       "type": "string",
@@ -127,11 +129,20 @@
     "conda_path": {
       "type": "string",
       "default": "/ceph/ibmi/it/thesis_data/mangler/miniforge3/envs",
-      "pattern": "/envs"
+      "pattern": "^(\\/[\\w\\*\\.]+)+/envs$"
     },
     "mamba": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/miniforge3"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/miniforge3",
+      "pattern": "^((\\/[\\w\\*\\.]+)+\\/?)$"
+    },
+    "threads": {
+      "type": "integer",
+      "default": 16
+    },
+    "mem": {
+      "type": "integer",
+      "default": 2
     }
   },
   "required": [
@@ -143,6 +154,9 @@
     "adapter2",
     "countFeature",
     "featureIdentifier",
-    "conda_path"
+    "conda_path",
+    "threads",
+    "mem",
+    "reads"
   ]
 }

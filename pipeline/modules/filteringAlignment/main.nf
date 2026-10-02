@@ -13,6 +13,8 @@ process FILTERSAMTOBAM {
     input:
     val sampleID
     path samFile
+    val threads
+    val mem
 
     output:
     path "${sampleID}_sorted.bam", emit: sortedBamFile
@@ -22,8 +24,8 @@ process FILTERSAMTOBAM {
     script:
     """
     samtools view -bS $samFile > ${sampleID}.bam
-    samtools sort ${sampleID}.bam -o ${sampleID}_sorted.bam
-    samtools index ${sampleID}_sorted.bam  
+    samtools sort ${sampleID}.bam -I 9 -m $mem -@ $threads -o ${sampleID}_sorted.bam
+    samtools index -@ $threads ${sampleID}_sorted.bam  
     """
 
     stub:
