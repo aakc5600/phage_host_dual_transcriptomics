@@ -6,7 +6,7 @@ process GSE_TO_SRA {
     val geo
 
     output:
-    path "**.sra"
+    path "**.sra", emit: sras
 
     script:
     """
@@ -15,7 +15,7 @@ process GSE_TO_SRA {
 
     stub:
     """
-    touch placeholder.sra
+    touch placeholder.sra placeholder2.sra
     """
 }
 
@@ -155,7 +155,9 @@ workflow FETCHREADS {
     main:
     if ( geo != "false" ) {
         sra = GSE_TO_SRA(geo)
-        fastq = SRA_TO_FASTQ(sra)
+        singleSRAs = sra.sras.flatMap {n -> [n[0], n[1]]}
+        singleSRAs.view()
+        fastq = SRA_TO_FASTQ(singleSRAs)
         fastq.singles.view()
         fastq.pairs.view()
         if (params.pairedEnd) {

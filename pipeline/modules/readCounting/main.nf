@@ -19,6 +19,7 @@ process FEATURECOUNTS {
     script:
     """
     featureCounts -p -M -O --primary \\
+    -T 20 \\
     -a $inputGFF \\
     -t $params.countFeature \\
     -o countData.tsv \\

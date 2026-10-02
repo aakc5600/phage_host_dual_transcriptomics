@@ -11,35 +11,35 @@
     },
     "pwd": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline",
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline",
       "format": "directory-path"
     },
     "hostGenome": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.fna"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.fna"
     },
     "phageGenome": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.fna"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.fna"
     },
     "hostGFF": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.gff"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*host.gff"
     },
     "phageGFF": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.gff"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/genomes/*phage.gff"
     },
     "pairedEnd": {
       "type": "boolean"
     },
     "geo": {
       "type": "string",
-      "pattern": "^(false)$|^(\\w{3,5}\\d{5,9})$"
+      "pattern": "^(false)$|^(\\w{3,5}\\d{5,9})( (\\w{3,5}\\d{5,9}))*$"
     },
     "reads": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/reads/*.fastq.gz"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/reads/*.fastq.gz"
     },
     "outputDir": {
       "type": "string",
@@ -69,11 +69,11 @@
     },
     "tools": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/downstream_processing/tools.py"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/downstream_processing/tools.py"
     },
     "metaPath": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/input/metadata/SraRunTable.csv"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/metadata/SraRunTable.csv"
     },
     "timeStart": {
       "type": "integer",
@@ -110,24 +110,28 @@
     },
     "pha_db": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/phx/pharokka_db"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/phx/pharokka_db"
     },
     "pho_db": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/phx/phold_db"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/phx/phold_db"
     },
     "phy_model": {
       "type": "string",
-      "default": "/home/mangl/lab/git/phage_host_dual_transcriptomics/pipeline/phx/phynteny_models"
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/phx/phynteny_models"
     },
     "user": {
       "type": "string",
-      "default": "mangl"
+      "default": "mangler"
     },
     "conda_path": {
       "type": "string",
-      "default": "/home/mangl/miniconda3/envs",
+      "default": "/ceph/ibmi/it/thesis_data/mangler/miniforge3/envs",
       "pattern": "/envs"
+    },
+    "mamba": {
+      "type": "string",
+      "default": "/ceph/ibmi/it/thesis_data/mangler/miniforge3"
     }
   },
   "required": [

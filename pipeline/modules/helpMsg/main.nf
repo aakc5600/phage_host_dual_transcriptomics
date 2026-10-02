@@ -43,7 +43,7 @@ def helpMessage() {
       --adapter1              Default is sequence of TruSeq adapter.
       --adapter2              Default is sequence of TruSeq adapter.
     
-      --conda_path            Default is "/home/$params.user/miniconda3/envs"
+      --conda_path            Default is $params.conda_path
 
     Arguments can also be set in the config file (./conf/params.config)
     """.stripIndent()

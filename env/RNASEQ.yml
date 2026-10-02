@@ -96,7 +96,7 @@ dependencies:
   - tk=8.6.15=h54e0aa7_0
   - tktable=2.10=hfce700a_2
   - tzdata=2026c=he532380_0
-  - wheel=0.47.0=pypi_0
+  - wheel=0.47.0-py310h06a4308_0
   - xorg-libx11=1.8.13=h65de747_0
   - xorg-libxau=1.0.12=h9b100fa_0
   - xorg-libxdmcp=1.1.5=h9b100fa_0
