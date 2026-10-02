@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.decomposition import PCA
 import re
-
+import argparse
 
 # Adding annotation to metadata, matching samples in raw counts table
 def annotateData(df, sampleDict):
@@ -366,3 +366,20 @@ def parseDict(string):
     for i in lis:
         dic[i.split(':')[0]] = i.split(':')[1]
     return dic
+
+
+def get_args():
+    parser = argparse.ArgumentParser(
+                        prog='Downstream Processing',
+                        description='This script processes uhhhhh stuff',
+                        epilog='Text at the bottom of help')
+
+    parser.add_argument('--bulkPath', type=str)
+    parser.add_argument('--metaPath', type=str)
+    parser.add_argument('--gffPath', type=str)
+    parser.add_argument('--gbkPath', type=str)
+    parser.add_argument('--sampleDict', type=str)
+    parser.add_argument('--middle', type=float)
+    parser.add_argument('--late', type=float)
+
+    return parser.parse_args()

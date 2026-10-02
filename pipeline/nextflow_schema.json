@@ -72,11 +72,6 @@
     "auto": {
       "type": "boolean"
     },
-    "tools": {
-      "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/downstream_processing/tools.py",
-      "pattern": "^((\\/[\\w\\*\\.]+)+)$"
-    },
     "metaPath": {
       "type": "string",
       "pattern": "^((\\/[\\w\\*\\.]+)+)$"
@@ -143,6 +138,9 @@
     "mem": {
       "type": "integer",
       "default": 2
+    },
+    "skipValidation": {
+      "type": "boolean"
     }
   },
   "required": [
