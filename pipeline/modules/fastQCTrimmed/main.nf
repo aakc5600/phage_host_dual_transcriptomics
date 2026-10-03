@@ -11,6 +11,7 @@ process FASTQCTRIMMED_PE {
     input:
     val sampleID
     path trimmedReads
+    val threads
 
     output:
     path "fastqc_trimmed_${sampleID}_*", emit: fastqc_post
@@ -19,8 +20,8 @@ process FASTQCTRIMMED_PE {
     """
     mkdir fastqc_trimmed_${sampleID}_1
     mkdir fastqc_trimmed_${sampleID}_2
-    fastqc -o fastqc_trimmed_${sampleID}_1 -q ${trimmedReads[0]}
-    fastqc -o fastqc_trimmed_${sampleID}_2 -q ${trimmedReads[1]}
+    fastqc -t $threads -o fastqc_trimmed_${sampleID}_1 -q ${trimmedReads[0]}
+    fastqc -t $threads -o fastqc_trimmed_${sampleID}_2 -q ${trimmedReads[1]}
     """
 
     stub:
@@ -44,6 +45,7 @@ process FASTQCTRIMMED_SE {
     input:
     val sampleID
     path trimmedReads
+    val threads
 
     output:
     path "fastqc_trimmed_${sampleID}_*", emit: fastqc_post
@@ -51,7 +53,7 @@ process FASTQCTRIMMED_SE {
     script:
     """
     mkdir fastqc_trimmed_${sampleID}_1
-    fastqc -o fastqc_trimmed_${sampleID}_1 -q ${trimmedReads[0]}
+    fastqc -t $threads -o fastqc_trimmed_${sampleID}_1 -q ${trimmedReads[0]}
     """
 
     stub:

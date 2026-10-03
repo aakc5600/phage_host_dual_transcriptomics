@@ -64,6 +64,34 @@ process ANNOTATE_PHY {
 process AUTO_PROCESSING {
     conda "${params.conda_path}/DOWNSTREAM"
 
+    tag "Processing $bulkPath, using $sampleDict"
+
+    input:
+    path bulkPath
+    path metaPath
+    path gffPath
+    val sampleDict
+    val middle
+    val late
+    path pwd
+
+    output:
+    path "*.tsv", emit: analysis
+
+    script:
+    """
+    python "${pwd}/downstream_processing/downstream.py" --bulkPath $bulkPath --metaPath $metaPath --gffPath $gffPath --sampleDict $sampleDict --middle $middle --late $late
+    """
+
+    stub:
+    """
+    touch test.tsv
+    """
+}
+
+process AUTO_PROCESSING_PH {
+    conda "${params.conda_path}/DOWNSTREAM"
+
     tag "Processing $bulkPath, using $sampleDict and $gbkPath"
 
     input:
@@ -81,6 +109,11 @@ process AUTO_PROCESSING {
 
     script:
     """
-    python "${pwd}/downstream_processing/downstream.py" --bulkPath --metaPath --gffPath --gbkPath --sampleDict --middle --late
+    python "${pwd}/downstream_processing/downstream.py" --bulkPath $bulkPath --metaPath $metaPath --gffPath $gffPath --gbkPath $gbkPath --sampleDict $sampleDict --middle $middle --late $late
+    """
+
+    stub:
+    """
+    touch test.tsv
     """
 }

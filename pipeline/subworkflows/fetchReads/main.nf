@@ -19,7 +19,7 @@ process GSE_TO_SRA {
     """
 }
 
-process SRA_TO_FASTQ {
+process SRA_TO_FASTQ_SE {
 
     conda "${params.conda_path}/SRATOOLS"
 
@@ -29,8 +29,35 @@ process SRA_TO_FASTQ {
     path sra
 
     output:
-    tuple env('SAMPLE'), path("*[0-9][0-9].fastq.gz"), emit: singles, optional: true
-    tuple env('SAMPLE'), path("*_{1,2}.fastq.gz"), emit: pairs, optional: true
+    tuple env('SAMPLE'), path("*[0-9][0-9].sra.fastq.gz"), emit: singles
+    
+    script:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}
+    fasterq-dump $sra
+    find . -name "*.fastq" -exec sh -c 'pigz {} || gzip {}' \\;
+    """
+
+    stub:
+    """
+    SRA=$sra
+    SAMPLE=\${SRA%%.sra}    
+    touch \${SAMPLE}_STUB_15.fastq.gz
+    """
+}
+
+process SRA_TO_FASTQ_PE {
+
+    conda "${params.conda_path}/SRATOOLS"
+
+    tag "fetching $params.geo"
+    
+    input:
+    path sra
+
+    output:
+    tuple env('SAMPLE'), path("*_{1,2}.sra.fastq.gz"), emit: pairs
     
     script:
     """
@@ -61,14 +88,15 @@ workflow FETCHREADS {
         sra = GSE_TO_SRA(geo)
         singleSRAs = sra.sras.flatMap {n -> [n[0], n[1]]}
         singleSRAs.view()
-        fastq = SRA_TO_FASTQ(singleSRAs)
-        fastq.singles.view()
-        fastq.pairs.view()
         if (params.pairedEnd) {
+            fastq = SRA_TO_FASTQ_PE(singleSRAs)
             reads = fastq.pairs
+            fastq.pairs.view()
         }
         else {
+            fastq = SRA_TO_FASTQ_SE(singleSRAs)
             reads = fastq.singles
+            fastq.singles.view()
         } 
     }
     else {

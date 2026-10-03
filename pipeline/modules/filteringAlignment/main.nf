@@ -23,8 +23,8 @@ process FILTERSAMTOBAM {
 
     script:
     """
-    samtools view -bS $samFile > ${sampleID}.bam
-    samtools sort ${sampleID}.bam -I 9 -m $mem -@ $threads -o ${sampleID}_sorted.bam
+    samtools view -@ $threads -bS $samFile > ${sampleID}.bam
+    samtools sort ${sampleID}.bam -l 9 -m $mem -@ $threads -o ${sampleID}_sorted.bam
     samtools index -@ $threads ${sampleID}_sorted.bam  
     """
 

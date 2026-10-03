@@ -10,6 +10,7 @@ process FASTQC_PE {
     
     input:
     tuple val(sample_id), path(reads)
+    val threads
 
     output:
     path "fastqc_${sample_id}_*", emit: fastqc_pre
@@ -18,8 +19,8 @@ process FASTQC_PE {
     """
     mkdir fastqc_${sample_id}_1
     mkdir fastqc_${sample_id}_2
-    fastqc -o fastqc_${sample_id}_1 -q ${reads[0]}
-    fastqc -o fastqc_${sample_id}_2 -q ${reads[1]}
+    fastqc -t $threads -o fastqc_${sample_id}_1 -q ${reads[0]}
+    fastqc -t $threads -o fastqc_${sample_id}_2 -q ${reads[1]}
     """
 
     stub:
@@ -40,6 +41,7 @@ process FASTQC_SE {
     
     input:
     tuple val(sample_id), path(reads)
+    val threads
 
     output:
     path "fastqc_${sample_id}_*", emit: fastqc_pre
@@ -47,7 +49,7 @@ process FASTQC_SE {
     script:
     """
     mkdir fastqc_${sample_id}_1
-    fastqc -o fastqc_${sample_id}_1 -q ${reads[0]}
+    fastqc -t $threads -o fastqc_${sample_id}_1 -q ${reads[0]}
     """
 
     stub:

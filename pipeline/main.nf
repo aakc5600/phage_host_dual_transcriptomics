@@ -18,7 +18,7 @@ workflow {
     checkDict(params.auto, params.sampleDict)
     hisat2 = BUILDHISAT2BASE(params.hostGenome, params.phageGenome, params.hostGFF, params.phageGFF)
     read_pairs_ch = FETCHREADS(params.geo, params.reads)
-    rnaseq = PROCESSRNASEQ(read_pairs_ch, BUILDHISAT2BASE.out.alignmentBase, params.threads, params.mem)
+    rnaseq = PROCESSRNASEQ(read_pairs_ch.read_pairs_ch, BUILDHISAT2BASE.out.alignmentBase, params.threads, params.mem)
     featurecounts = FEATURECOUNTS(PROCESSRNASEQ.out.sortedBamFile.collect(), BUILDHISAT2BASE.out.dualGFF, params.threads)
     multiqc = MULTIQC(FEATURECOUNTS.out.countSummary, PROCESSRNASEQ.out.cutadaptReport.collect().ifEmpty([]), PROCESSRNASEQ.out.fastqc_pre.collect(), PROCESSRNASEQ.out.fastqc_post.collect())    
     processing = PROCESSING(params.auto, params.gbkPath, params.phageGenome, params.pharokka, params.phold, params.phynteny, params.pha_db, params.pho_db, params.phy_model, params.threads, featurecounts.countTable, params.metaPath, hisat2.dualGFF, params.sampleDict, params.timeUntilMiddle, params.timeUntilLate, params.pwd)
@@ -41,7 +41,7 @@ workflow {
 
     multiqc_r = multiqc.multiqc_r
 
-    downstream = processing.analysis
+    downstream = processing.processing
     pha = processing.pha
     pho = processing.pho
     phy = processing.phy

@@ -377,7 +377,7 @@ def get_args():
     parser.add_argument('--bulkPath', type=str)
     parser.add_argument('--metaPath', type=str)
     parser.add_argument('--gffPath', type=str)
-    parser.add_argument('--gbkPath', type=str)
+    parser.add_argument('--gbkPath', type=str, default="false")
     parser.add_argument('--sampleDict', type=str)
     parser.add_argument('--middle', type=float)
     parser.add_argument('--late', type=float)

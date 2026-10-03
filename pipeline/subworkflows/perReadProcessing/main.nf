@@ -19,18 +19,18 @@ workflow PROCESSRNASEQ {
     main: 
         if(params.pairedEnd) {
             // read_pairs_ch = channel.fromFilePairs(reads, size: 2, checkIfExists: true)
-            fastqc_pre = FASTQC_PE(read_pairs_ch)
+            fastqc_pre = FASTQC_PE(read_pairs_ch, threads)
             TRIM_PE(read_pairs_ch)
-            fastqc_post = FASTQCTRIMMED_PE(TRIM_PE.out.sampleID, TRIM_PE.out.trimmedReads)
+            fastqc_post = FASTQCTRIMMED_PE(TRIM_PE.out.sampleID, TRIM_PE.out.trimmedReads, threads)
             MAPPINGPE(TRIM_PE.out.sampleID, TRIM_PE.out.trimmedReads, alignmentBase)
             FILTERSAMTOBAM(MAPPINGPE.out.sampleID, MAPPINGPE.out.samFile, threads, mem)
             cutadaptReport = TRIM_PE.out.cutadaptReport
         }
         else {
             // read_pairs_ch = channel.fromFilePairs(reads, size: -1, checkIfExists: true)
-            fastqc_pre = FASTQC_SE(read_pairs_ch)
+            fastqc_pre = FASTQC_SE(read_pairs_ch, threads)
             TRIM_SE(read_pairs_ch)
-            fastqc_post = FASTQCTRIMMED_SE(TRIM_SE.out.sampleID, TRIM_SE.out.trimmedReads)
+            fastqc_post = FASTQCTRIMMED_SE(TRIM_SE.out.sampleID, TRIM_SE.out.trimmedReads, threads)
             MAPPINGSE(TRIM_SE.out.sampleID, TRIM_SE.out.trimmedReads, alignmentBase)
             FILTERSAMTOBAM(MAPPINGSE.out.sampleID, MAPPINGSE.out.samFile, threads, mem)
             cutadaptReport = TRIM_SE.out.cutadaptReport

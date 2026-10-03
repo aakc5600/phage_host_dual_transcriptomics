@@ -2,6 +2,6 @@
 /results/
 /.nextflow/
 .nextflow.log*
-/input/*
 /phx/*
-/downstream_processing/outdated/
+/input/reads
+downstream_processing/__pycache__/
