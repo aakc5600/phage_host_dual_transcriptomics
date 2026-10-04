@@ -109,7 +109,7 @@ process AUTO_PROCESSING_PH {
 
     script:
     """
-    python "${pwd}/downstream_processing/downstream.py" --bulkPath $bulkPath --metaPath $metaPath --gffPath $gffPath --gbkPath $gbkPath --sampleDict $sampleDict --middle $middle --late $late
+    python "${pwd}/downstream_processing/downstream.py" --bulkPath "$bulkPath" --metaPath "$metaPath" --gffPath "$gffPath" --gbkPath "$gbkPath" --sampleDict "$sampleDict" --middle $middle --late $late
     """
 
     stub:

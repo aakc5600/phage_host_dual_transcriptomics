@@ -301,7 +301,7 @@ def classLabelMax(tpm, middle, late):
     labels = []
     #extract all measured timings from column names
     timings = tpm.iloc[:,:-3].columns.astype(float).tolist()
-
+    
     i = 0
     while i < tpm.shape[0]:
         # Get array of expression values at time points
@@ -316,7 +316,7 @@ def classLabelMax(tpm, middle, late):
         timePoint = timings[min(indices)]
 
         if timePoint == 0:
-            labels.append('None')
+            labels.append('before')
         elif timePoint < middle:
             labels.append('early')
         elif timePoint < late:
@@ -356,9 +356,9 @@ def findRow(path):
 
 # Automatically find which string corresponds to host and phage genome by frequency in gff
 def findEntity(df):
-    host = df[0].value_counts().index.values[0]
-    phage = df[0].value_counts().index.values[1]
-    return { host : 'host', phage : 'phage'}
+    host = df.iloc[:,0].value_counts().index.values[0]
+    phage = df.iloc[:,0].value_counts().index.values[1]
+    return { 'host' : host, 'phage' : phage, host : 'host', phage: 'phage'}
 
 def parseDict(string):
     lis = string.split(', ')

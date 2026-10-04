@@ -20,9 +20,9 @@ bulkPath = args.bulkPath
 # Metadata from SRA. Can be aquired from SRA Run Selector
 metaPath = args.metaPath
 # Concatenated phage/host gff3 file, output from nextflow pipeline
-gffPath = args.metaPath
+gffPath = args.gffPath
 # Path to gbk
-gbkPath = args.metaPath
+gbkPath = args.gbkPath
 # sample dict
 sampleDict = args.sampleDict
 # Time after which a gene is classified as middle
@@ -165,15 +165,18 @@ logTPMs = logTPMs.join(tpms.iloc[:, -2:])
 logTPMs = fillSymbols(logTPMs)
 # Make gene names unique
 logTPMs = make_unique_with_index(logTPMs)
+# print(logTPMs.head())
 
 
 # Log2+1 normalization of raw counts
-logs = logNorm(df_norRNAs)
+logs = logNorm(df_norRNAs.iloc[:, :-2])
+#logTPMs = logTPMs.join(df_norRNAs.iloc[:, -2:])
 logs['Entity'] = gff3.loc[sorted(logs.index.to_list()), 'Entity']
 logs['Symbol'] = gff3.loc[sorted(logs.index.to_list()), 'Symbol']
 logs = fillSymbols(logs)
 # Make gene names unique
 logs = make_unique_with_index(logs)
+# print(logs.head())
 
 
 # ## 3 Filter samples, if necessary
@@ -224,7 +227,7 @@ logTPMsPhage = logTPMs[logTPMs['Entity'] == 'phage']
 # Update all tables by excluding 4_R1
 # updatedOrder = ['0_R1', '0_R2', '0_R3', '1_R1', '1_R2', '1_R3', '4_R2', '4_R3', '7_R1', '7_R2', '7_R3', '20_R1', '20_R2', '20_R3']
 
-updatedOrder = df.drop(['4_R1'], axis = 1).sort_index(axis=1).columns.tolist()
+# updatedOrder = df.drop(['4_R1'], axis = 1).sort_index(axis=1).columns.tolist()
 
 # Or if no samples need to be excluded
 
@@ -233,7 +236,7 @@ updatedOrder = columnOrder
 
 # Updated tpms
 # txPCA(tpms[updatedOrder])
-# plt.title("PCA on TPM values after excluding sample 4_R1")
+# plt.title("PCA on TPM values after excluding sample 4_R1")dtim
 
 # # Updated logTPMs
 # txPCA(logTPMs[updatedOrder])
@@ -287,7 +290,8 @@ TPMsds[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
 
 # Create dataframe with relative expression values compared to highest expression timepoint
 # TPMmeansCopy = TPMmeans[['0','1','4','7','20']].copy() # adapt to dataset
-TPMmeansCopy = TPMmeans[findTimes(TPMmeans)].copy()
+times = findTimes(TPMmeans)
+TPMmeansCopy = TPMmeans[times].copy()
 propExp = proportionalExp(TPMmeansCopy)
 propExp[['Entity', 'Symbol']] = TPMmeans[['Entity', 'Symbol']]
 propExp.head(2)
@@ -310,7 +314,7 @@ propExp.head(2)
 TPMmeans = classLabelThreshold(TPMmeans,middle,late)
 TPMmeans = classLabelMax(TPMmeans,middle,late)
 
-TPMmeans[TPMmeans["Entity"] == "phage"].head(2)
+# TPMmeans[TPMmeans["Entity"] == "phage"].head(2)
 
 # We also add determined classes to other dfs.
 
@@ -341,7 +345,20 @@ TPMsds['Variance'] = tpmsUpdated['Variance']
 propExp['Variance'] = tpmsUpdated['Variance']
 
 df_norRNAs[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
-df_norRNAsUpdated = df_norRNAs.drop('4_R1', axis = 1)
+df_norRNAsUpdated = df_norRNAs #.drop('4_R1', axis = 1)
+
+all_tpm = tpmsUpdated
+all_tpm[times] = TPMsds[times]
+
+def makeStds(times):
+    dic = {}
+    for i in times:
+        dic[i] = str(i)+"_std"
+    return dic
+
+all_tpm = all_tpm.rename(columns = makeStds(times))
+
+print(all_tpm.sort_index(axis=1).columns)
 
 # ## 7. Write data to output
 
@@ -358,3 +375,17 @@ propExp.to_csv('fractional_expression.tsv', sep = '\t')
 # Processed gff3 file
 gff3_host.to_csv('host_gff3.tsv', sep='\t')
 gff3_phage.to_csv('phage_gff3.tsv', sep='\t')
+
+# We need TPMs, Raw Counts (with proportional counts).
+# each with counts, avgs, stdDev, 
+
+# Full TPM table
+tpmsUpdated.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_TPM.tsv', sep = '\t')
+# Full raw_counts table
+df_norRNAsUpdated.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_raw_counts.tsv', sep = '\t')
+# Summarized (time point means) TPM table
+TPMmeans.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_TPM_means.tsv', sep = '\t')
+# Summarized (time point) TPM standard deviation
+TPMsds.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_TPM_std.tsv', sep = '\t')
+# Proportional expression per gene and time point
+propExp.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_fractional_expression.tsv', sep = '\t')
