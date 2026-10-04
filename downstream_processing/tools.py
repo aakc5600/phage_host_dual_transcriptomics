@@ -316,7 +316,7 @@ def classLabelMax(tpm, middle, late):
         timePoint = timings[min(indices)]
 
         if timePoint == 0:
-            labels.append('before')
+            labels.append('None')
         elif timePoint < middle:
             labels.append('early')
         elif timePoint < late:

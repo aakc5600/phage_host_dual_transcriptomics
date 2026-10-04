@@ -26,7 +26,7 @@ process SRA_TO_FASTQ_SE {
     tag "fetching $params.geo"
     
     input:
-    path sra
+    each path(sra)
 
     output:
     tuple env('SAMPLE'), path("*[0-9][0-9].sra.fastq.gz"), emit: singles
@@ -54,7 +54,7 @@ process SRA_TO_FASTQ_PE {
     tag "fetching $params.geo"
     
     input:
-    path sra
+    each path(sra)
 
     output:
     tuple env('SAMPLE'), path("*_{1,2}.sra.fastq.gz"), emit: pairs
@@ -81,20 +81,19 @@ workflow FETCHREADS {
     take:
     geo
     reads
-    // pigz
 
     main:
     if ( geo != "false" ) {
         sra = GSE_TO_SRA(geo)
-        singleSRAs = sra.sras.flatMap {n -> [n[0], n[1]]}
-        singleSRAs.view()
+        //singleSRAs = sra.sras.flatten() //flatMap {n -> [n[0], n[1]]}
+        //singleSRAs.view()
         if (params.pairedEnd) {
-            fastq = SRA_TO_FASTQ_PE(singleSRAs)
+            fastq = SRA_TO_FASTQ_PE(sra.sras)
             reads = fastq.pairs
             fastq.pairs.view()
         }
         else {
-            fastq = SRA_TO_FASTQ_SE(singleSRAs)
+            fastq = SRA_TO_FASTQ_SE(sra.sras)
             reads = fastq.singles
             fastq.singles.view()
         } 

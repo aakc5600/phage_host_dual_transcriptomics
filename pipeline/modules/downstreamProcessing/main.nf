@@ -76,11 +76,12 @@ process AUTO_PROCESSING {
     path pwd
 
     output:
-    path "*.tsv", emit: analysis
+    path "**.tsv", emit: analysis
 
     script:
     """
-    python "${pwd}/downstream_processing/downstream.py" --bulkPath $bulkPath --metaPath $metaPath --gffPath $gffPath --sampleDict $sampleDict --middle $middle --late $late
+    mkdir phage_only
+    python "${pwd}/downstream_processing/downstream.py" --bulkPath "$bulkPath" --metaPath "$metaPath" --gffPath "$gffPath" --sampleDict "$sampleDict" --middle $middle --late $late
     """
 
     stub:
@@ -109,6 +110,7 @@ process AUTO_PROCESSING_PH {
 
     script:
     """
+    mkdir phage_only
     python "${pwd}/downstream_processing/downstream.py" --bulkPath "$bulkPath" --metaPath "$metaPath" --gffPath "$gffPath" --gbkPath "$gbkPath" --sampleDict "$sampleDict" --middle $middle --late $late
     """
 

@@ -61,6 +61,8 @@ df = changeColnames(df_initial.iloc[:,5:df_initial.shape[1]], metadataFull)
 df = df.sort_index(axis=1)
 # df = df[['0_R1', '0_R2', '0_R3', '1_R1', '1_R2', '1_R3', '4_R1', '4_R2', '4_R3', '7_R1', '7_R2', '7_R3', '20_R1', '20_R2', '20_R3']]
 
+sampleNames = df.columns.to_list()
+
 # ### 2.2 Remove rRNA genes
 # 
 # To perform depletion of ribosomal RNA genes, which quantitatively make up the majority of RNA within a sample, we consult the gff3 file with host and phage information to get rRNA GeneIDs. We do this by filtering the gff3 file for gene entries and accessing the attributes column to get GeneIDs, GeneType and GeneSymbol (important for later processing). Example:
@@ -334,7 +336,7 @@ gff3_phage = gff3_final[gff3_final['seq_id'] == entity["phage"]]
 
 # Add stabilized variance of genes over timepoints to tpms dataframe
 tpmsUpdated = stabilizedVariance(tpmsUpdated)
-tpmsUpdated.head()
+# tpmsUpdated.head()
 
 # Calculated variances are further added to other dataframes.
 
@@ -347,18 +349,29 @@ propExp['Variance'] = tpmsUpdated['Variance']
 df_norRNAs[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
 df_norRNAsUpdated = df_norRNAs #.drop('4_R1', axis = 1)
 
-all_tpm = tpmsUpdated
-all_tpm[times] = TPMsds[times]
+def removeOutlierFromList(list, outlier):
+    newlist = []
+    for i in list:
+        if (str(i) != str(outlier)):
+            newlist.append(i)         
+    return newlist
 
-def makeStds(times):
-    dic = {}
+
+def addSuffix(times, suffix):
+    lis = []
     for i in times:
-        dic[i] = str(i)+"_std"
-    return dic
+        lis.append(str(i)+str(suffix))
+    return lis
 
-all_tpm = all_tpm.rename(columns = makeStds(times))
+sampleNamesUpdated = removeOutlierFromList(sampleNames, "none")
 
-print(all_tpm.sort_index(axis=1).columns)
+all = df_norRNAsUpdated
+all[addSuffix(sampleNamesUpdated, "_TPM")] = tpmsUpdated[sampleNamesUpdated]
+all[['Variance', 'ClassThreshold', 'ClassMax']] = tpmsUpdated[['Variance', 'ClassMax', 'ClassThreshold']]
+all[addSuffix(times, "_TPMmeans")] = TPMmeans[times]
+all[addSuffix(times, "_TPMsds")] = TPMsds[times]
+all[addSuffix(times, "_relExp")] = propExp[times]
+all = all.sort_index(axis=1)
 
 # ## 7. Write data to output
 
@@ -372,12 +385,13 @@ TPMmeans.to_csv('TPM_means.tsv', sep = '\t')
 TPMsds.to_csv('TPM_std.tsv', sep = '\t')
 # Proportional expression per gene and time point
 propExp.to_csv('fractional_expression.tsv', sep = '\t')
+# Table with all values
+all.to_csv('all_values.tsv', sep='\t')
 # Processed gff3 file
 gff3_host.to_csv('host_gff3.tsv', sep='\t')
 gff3_phage.to_csv('phage_gff3.tsv', sep='\t')
 
-# We need TPMs, Raw Counts (with proportional counts).
-# each with counts, avgs, stdDev, 
+
 
 # Full TPM table
 tpmsUpdated.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_TPM.tsv', sep = '\t')
@@ -389,3 +403,5 @@ TPMmeans.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_TPM_mean
 TPMsds.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_TPM_std.tsv', sep = '\t')
 # Proportional expression per gene and time point
 propExp.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_fractional_expression.tsv', sep = '\t')
+# all
+all.loc[all['Entity'] == 'phage'].to_csv('phage_only/phage_all_values.tsv', sep = '\t')
