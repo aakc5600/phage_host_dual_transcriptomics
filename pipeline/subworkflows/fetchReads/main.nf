@@ -81,13 +81,14 @@ workflow FETCHREADS {
     take:
     geo
     reads
+    pairedEnd
 
     main:
     if ( geo != "false" ) {
         sra = GSE_TO_SRA(geo)
         //singleSRAs = sra.sras.flatten() //flatMap {n -> [n[0], n[1]]}
         //singleSRAs.view()
-        if (params.pairedEnd) {
+        if ( pairedEnd == "true" ) {
             fastq = SRA_TO_FASTQ_PE(sra.sras)
             reads = fastq.pairs
             fastq.pairs.view()
@@ -99,7 +100,7 @@ workflow FETCHREADS {
         } 
     }
     else {
-        if (params.pairedEnd) {
+        if ( pairedEnd == "true") {
             reads = channel.fromFilePairs(reads, size: 2, checkIfExists: true)
         }
         else {

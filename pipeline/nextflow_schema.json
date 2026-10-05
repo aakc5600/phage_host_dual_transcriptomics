@@ -36,16 +36,17 @@
       "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "pairedEnd": {
-      "type": "boolean"
+      "type": "string",
+      "enum": ["false", "true"]
     },
     "geo": {
       "type": "string",
       "pattern": "^(false)$|^(\\w{3,5}\\d{5,9})( (\\w{3,5}\\d{5,9}))*$",
-      "default": "SRR21013148 SRR21013144"
+      "default": "SRR21013144 SRR21013143 SRR21013141 SRR21013139"
     },
     "reads": {
       "type": "string",
-      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/reads/*.fastq.gz",
+      "default": "/ceph/ibmi/it/thesis_data/mangler/git/phage_host_dual_transcriptomics/pipeline/input/reads/*.sra.fastq.gz",
       "pattern": "^((\\/[\\w\\*\\.]+)+)$"
     },
     "outputDir": {
@@ -69,10 +70,12 @@
       "default": "ID"
     },
     "verboseHelp": {
-      "type": "boolean"
+      "type": "string",
+      "enum": ["false", "true"]
     },
     "auto": {
-      "type": "boolean"
+      "type": "string",
+      "enum": ["false", "true"]
     },
     "metaPath": {
       "type": "string",
@@ -100,13 +103,16 @@
       "pattern": "^(false)$|^(.*\\.gbk)$"
     },
     "pharokka": {
-      "type": "boolean"
+      "type": "string",
+      "enum": ["false", "true"]
     },
     "phold": {
-      "type": "boolean"
+      "type": "string",
+      "enum": ["false", "true"]
     },
     "phynteny": {
-      "type": "boolean"
+      "type": "string",
+      "enum": ["false", "true"]
     },
     "pha_db": {
       "type": "string",
@@ -140,10 +146,11 @@
     },
     "mem": {
       "type": "string",
-      "default": "2G"
+      "default": "10G"
     },
     "skipValidation": {
-      "type": "boolean"
+      "type": "string",
+      "enum": ["false", "true"]
     }
   },
   "required": [

@@ -15,9 +15,10 @@ workflow PROCESSRNASEQ {
         alignmentBase
         threads
         mem
+        pairedEnd
 
     main: 
-        if(params.pairedEnd) {
+        if( pairedEnd == "true" ) {
             // read_pairs_ch = channel.fromFilePairs(reads, size: 2, checkIfExists: true)
             fastqc_pre = FASTQC_PE(read_pairs_ch, threads)
             TRIM_PE(read_pairs_ch)

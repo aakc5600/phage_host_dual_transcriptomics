@@ -12,13 +12,13 @@ include { PROCESSING } from './subworkflows/downstreamProcessing'
 workflow {
     main:
     parseHelp(params.help, params.verboseHelp)
-    if (params.skipValidation == false) {
-        validateParameters()
+    if (params.skipValidation != "true") {
+        validateParameters(cast_cli_params: false)
     }
     checkDict(params.auto, params.sampleDict)
     hisat2 = BUILDHISAT2BASE(params.hostGenome, params.phageGenome, params.hostGFF, params.phageGFF)
-    read_pairs_ch = FETCHREADS(params.geo, params.reads)
-    rnaseq = PROCESSRNASEQ(read_pairs_ch.read_pairs_ch, BUILDHISAT2BASE.out.alignmentBase, params.threads, params.mem)
+    read_pairs_ch = FETCHREADS(params.geo, params.reads, params.pairedEnd)
+    rnaseq = PROCESSRNASEQ(read_pairs_ch.read_pairs_ch, BUILDHISAT2BASE.out.alignmentBase, params.threads, params.mem, params.pairedEnd)
     featurecounts = FEATURECOUNTS(PROCESSRNASEQ.out.sortedBamFile.collect(), BUILDHISAT2BASE.out.dualGFF, params.threads)
     multiqc = MULTIQC(FEATURECOUNTS.out.countSummary, PROCESSRNASEQ.out.cutadaptReport.collect().ifEmpty([]), PROCESSRNASEQ.out.fastqc_pre.collect(), PROCESSRNASEQ.out.fastqc_post.collect())    
     processing = PROCESSING(params.auto, params.gbkPath, params.phageGenome, params.pharokka, params.phold, params.phynteny, params.pha_db, params.pho_db, params.phy_model, params.threads, featurecounts.countTable, params.metaPath, hisat2.dualGFF, params.sampleDict, params.timeUntilMiddle, params.timeUntilLate, params.pwd)
