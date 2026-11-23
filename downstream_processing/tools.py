@@ -5,6 +5,7 @@ import seaborn as sns
 from sklearn.decomposition import PCA
 import re
 import argparse
+from sklearn.cluster import KMeans
 
 # Adding annotation to metadata, matching samples in raw counts table
 def annotateData(df, sampleDict):
@@ -334,6 +335,63 @@ def classLabelMax(tpm, middle, late):
 
     return tpmOut
 
+
+def getClassByKmeans(df:pd.DataFrame, k: int) -> pd.DataFrame:
+    """
+    Input parameters:
+    k: number of clusters
+
+    Output:
+    JSON array with dictionaries containing Symbol, Time, ClassKMeans and Value.
+    """
+
+    k = int(k)
+
+    def is_float(s):
+        try:
+            float(s)
+            return True
+        except Exception:
+            return False
+
+    # keep only phage genes
+    df_phages = df[df["Entity"] == "phage"].copy()
+    # get time columns
+    time_cols_original = [c for c in df_phages.columns if is_float(c)]
+    time_cols_sorted = sorted(time_cols_original, key=lambda x: float(x))
+
+    # expression matrix for clustering
+    dataset = df_phages[time_cols_sorted].astype(float)
+    # run k-means
+    kmeans = KMeans(n_clusters=k, random_state=42, n_init="auto").fit(dataset)
+
+    labels = kmeans.labels_
+
+    centers = pd.DataFrame(
+        kmeans.cluster_centers_,
+        columns=time_cols_sorted
+    )
+
+    # order clusters by the time point of maximal expression
+    ordered_cluster_ids = centers.to_numpy().argmax(axis=1).argsort()
+
+    # map original k-means cluster ID to ordered class ID
+    cluster_to_ordered_class = {
+        cluster_id: ordered_class
+        for ordered_class, cluster_id in enumerate(ordered_cluster_ids)
+    }
+
+    # assign ordered class to each gene
+    df_phages["ClassKMeans"] = [
+        cluster_to_ordered_class[label]
+        for label in labels
+    ]
+
+    df_final = df.copy()
+    df_final["ClassKMeans"] = df_phages["ClassKMeans"]
+    return df_phages
+
+
 # returns the times at the start of column names skipping non-sample columns
 def findTimes(df):
     cols = df.columns.values
@@ -381,5 +439,6 @@ def get_args():
     parser.add_argument('--sampleDict', type=str)
     parser.add_argument('--middle', type=float)
     parser.add_argument('--late', type=float)
+    parser.add_argument('--kmeans', type=int)
 
     return parser.parse_args()

@@ -73,6 +73,7 @@ process AUTO_PROCESSING {
     val sampleDict
     val middle
     val late
+    val kmeans
     path pwd
 
     output:
@@ -81,7 +82,7 @@ process AUTO_PROCESSING {
     script:
     """
     mkdir phage_only
-    python "${pwd}/downstream_processing/downstream.py" --bulkPath "$bulkPath" --metaPath "$metaPath" --gffPath "$gffPath" --sampleDict "$sampleDict" --middle $middle --late $late
+    python "${pwd}/downstream_processing/downstream.py" --bulkPath "$bulkPath" --metaPath "$metaPath" --gffPath "$gffPath" --sampleDict "$sampleDict" --middle $middle --late $late --kmeans $kmeans
     """
 
     stub:
@@ -103,6 +104,7 @@ process AUTO_PROCESSING_PH {
     val sampleDict
     val middle
     val late
+    val kmeans
     path pwd
 
     output:
@@ -111,7 +113,7 @@ process AUTO_PROCESSING_PH {
     script:
     """
     mkdir phage_only
-    python "${pwd}/downstream_processing/downstream.py" --bulkPath "$bulkPath" --metaPath "$metaPath" --gffPath "$gffPath" --gbkPath "$gbkPath" --sampleDict "$sampleDict" --middle $middle --late $late
+    python "${pwd}/downstream_processing/downstream.py" --bulkPath "$bulkPath" --metaPath "$metaPath" --gffPath "$gffPath" --gbkPath "$gbkPath" --sampleDict "$sampleDict" --middle $middle --late $late --kmeans $kmeans
     """
 
     stub:

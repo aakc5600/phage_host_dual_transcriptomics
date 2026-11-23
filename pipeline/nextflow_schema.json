@@ -133,12 +133,12 @@
     "conda_path": {
       "type": "string",
       "default": "/ceph/ibmi/it/thesis_data/mangler/miniforge3/envs",
-      "pattern": "^(\\/[\\w\\*\\.]+)+/envs$"
+      "pattern": "^(\\/[\\w\\*\\.-]+)+/envs$"
     },
     "mamba": {
       "type": "string",
       "default": "/ceph/ibmi/it/thesis_data/mangler/miniforge3",
-      "pattern": "^((\\/[\\w\\*\\.]+)+\\/?)$"
+      "pattern": "^((\\/[\\w\\*\\.-]+)+\\/?)$"
     },
     "threads": {
       "type": "integer",
@@ -151,6 +151,10 @@
     "skipValidation": {
       "type": "string",
       "enum": ["false", "true"]
+    },
+    "kmeans": {
+      "type": "string",
+      "default": 5
     }
   },
   "required": [

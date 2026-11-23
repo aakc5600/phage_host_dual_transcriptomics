@@ -21,7 +21,7 @@ workflow {
     rnaseq = PROCESSRNASEQ(read_pairs_ch.read_pairs_ch, BUILDHISAT2BASE.out.alignmentBase, params.threads, params.mem, params.pairedEnd)
     featurecounts = FEATURECOUNTS(PROCESSRNASEQ.out.sortedBamFile.collect(), BUILDHISAT2BASE.out.dualGFF, params.threads)
     multiqc = MULTIQC(FEATURECOUNTS.out.countSummary, PROCESSRNASEQ.out.cutadaptReport.collect().ifEmpty([]), PROCESSRNASEQ.out.fastqc_pre.collect(), PROCESSRNASEQ.out.fastqc_post.collect())    
-    processing = PROCESSING(params.auto, params.gbkPath, params.phageGenome, params.pharokka, params.phold, params.phynteny, params.pha_db, params.pho_db, params.phy_model, params.threads, featurecounts.countTable, params.metaPath, hisat2.dualGFF, params.sampleDict, params.timeUntilMiddle, params.timeUntilLate, params.pwd)
+    processing = PROCESSING(params.auto, params.gbkPath, params.phageGenome, params.pharokka, params.phold, params.phynteny, params.pha_db, params.pho_db, params.phy_model, params.threads, featurecounts.countTable, params.metaPath, hisat2.dualGFF, params.sampleDict, params.timeUntilMiddle, params.timeUntilLate, params.kmeans, params.pwd)
 
     publish:
     // This looks so ugly, but idk if there's a nicer way 

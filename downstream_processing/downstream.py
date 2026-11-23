@@ -29,7 +29,8 @@ sampleDict = args.sampleDict
 middle = args.middle
 # Time after which a gene is classified as late
 late = args.late
-
+# number of clusters for kmeans
+kmeans = args.kmeans
 
 # Load data as pandas dataframe
 df_initial = pd.read_csv(bulkPath, sep = '\t', comment='#', index_col=0)
@@ -313,8 +314,11 @@ propExp.head(2)
 # 
 # One may need to add more conditions, if more timepoints are available.
 # Classify phage genes according to set timepoints in the respective functions
+
 TPMmeans = classLabelThreshold(TPMmeans,middle,late)
 TPMmeans = classLabelMax(TPMmeans,middle,late)
+if isinstance(kmeans,int):
+    TPMmeans = getClassByKmeans(TPMmeans,kmeans)
 
 # TPMmeans[TPMmeans["Entity"] == "phage"].head(2)
 
