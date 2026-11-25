@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.decomposition import PCA
+# from sklearn.decomposition import PCA
 import re
 import argparse
 from sklearn.cluster import KMeans
@@ -148,23 +148,18 @@ def txPCA(df):
 
 
 # Getting mean and sd for samples of same time points
-def getMeanSD(df):
-    # Get sample base names
-    sampleBase = set([x[:-1] for x in df.columns])
-    samples = [x[:-1] for x in df.columns]
-
+def getMeanSD(df: pd.DataFrame, sampleTimes:list[str]) -> tuple[pd.DataFrame,pd.DataFrame]:
     # Initialize empty dataframes to hold mean and sd
     means = pd.DataFrame(index=df.index)
     sds = pd.DataFrame(index=df.index)
 
     # Loop over each sample base (e.g., '0_R', '1_R', etc.)
-    for base in sampleBase:
-        indices = [i for i in range(len(samples)) if base == samples[i]]
+    for base in sampleTimes:
+        indices = [i for i in range(len(sampleTimes)) if base == sampleTimes[i]]
         col_subset = df.iloc[:, indices]
 
-        base_name = base[:-2]  # Strip '_R' from the base
-        means[base_name] = col_subset.mean(axis=1)
-        sds[base_name] = col_subset.std(axis=1)
+        means[base] = col_subset.mean(axis=1)
+        sds[base] = col_subset.std(axis=1)
 
     return means, sds
 
@@ -174,7 +169,10 @@ def proportionalExp(df):
     normExp = df.copy()
     for i in range(normExp.shape[0]):
         maxValue = normExp.iloc[i, :].max()
-        normExp.iloc[i,:] = normExp.iloc[i,:]/maxValue
+        if maxValue > 0:   
+            normExp.iloc[i,:] = normExp.iloc[i,:]/maxValue
+        else:
+            normExp.iloc[i,:] = normExp.iloc[i,:]*0
 
     return normExp
 
@@ -184,8 +182,8 @@ def fillSymbols(df):
     df_new = df.copy()
     index = df.index.to_list()
     for i in range(0,df.shape[0]):
-        if (df.iloc[i,-1:].values == None):
-            df_new.iloc[i,-1:] = index[i]
+        if (pd.isna(df.iloc[i,-1])):
+            df_new.iloc[i,-1] = index[i]
     return df_new
 
 
@@ -233,13 +231,13 @@ def make_unique(lst):
 
 
 # Add stabilized variance for genes over timepoints to tpms dataframe
-def stabilizedVariance(df):
+def stabilizedVariance(df, sampleNames):
     labels = list()
-    
+    temp_df = df[sampleNames].copy()
     i = 0
-    while i < df.shape[0]:
+    while i < temp_df.shape[0]:
         # Get array of expression values at time points
-        expressions = list(df.iloc[i,0:(df.shape[1]-4)])
+        expressions = list(temp_df.iloc[i,:])
         # Get mean expression for the gene
         exprMean = np.mean(np.array(expressions))
         # Get the variance for the gene
@@ -259,15 +257,15 @@ def stabilizedVariance(df):
 # Add a classification label based on exceeding 20 % of maximal expression
 # Takes time after which genes are "middle" or "late" genes
 
-def classLabelThreshold(tpm, middle, late):
+def classLabelThreshold(tpm, timeCols, middle, late):
     labels = []
     #extract all measured timings from column names
-    timings = tpm.iloc[:,:-2].columns.astype(float).tolist()
+    timings = tpm[timeCols].columns.astype(float).tolist()
 
     i = 0
     while i < tpm.shape[0]:
         # Get array of expression values at time points
-        expressions = list(tpm.iloc[i,0:(tpm.shape[1]-2)])
+        expressions = list(tpm[timeCols].iloc[i,:])
         # Get maximal value for each gene across time points
         maxTPM = max(expressions)
         # Get the threshold value
@@ -298,23 +296,25 @@ def classLabelThreshold(tpm, middle, late):
 
 
 # Add a classification label based on maximal expression 
-def classLabelMax(tpm, middle, late):
+def classLabelMax(tpm, timeCols, middle, late):
     labels = []
     #extract all measured timings from column names
-    timings = tpm.iloc[:,:-3].columns.astype(float).tolist()
+    timings = tpm[timeCols].columns.astype(float).tolist()
     
     i = 0
     while i < tpm.shape[0]:
-        # Get array of expression values at time points
-        expressions = list(tpm.iloc[i,0:(tpm.shape[1]-3)])
-        # Get maximal value for each gene across time points
-        maxTPM = max(expressions)
-        # Get the threshold value
-        thresHold = maxTPM*0.2
-        # get index of time point
-        indices = [x for x in range(len(expressions)) if expressions[x] >= thresHold]
-        # convert index to time point
-        timePoint = timings[min(indices)]
+        # # Get array of expression values at time points
+        # expressions = list(tpm[timeCols].iloc[i,:])
+        # # Get maximal value for each gene across time points
+        # maxTPM = max(expressions)
+        # # Get the threshold value
+        # thresHold = maxTPM
+        # # get index of time point
+        # indices = [x for x in range(len(expressions)) if expressions[x] >= thresHold]
+        # # convert index to time point
+        # timePoint = timings[min(indices)]
+
+        timePoint = timings[tpm[timeCols].iloc[i,:].argmax()]
 
         if timePoint == 0:
             labels.append('None')
@@ -336,7 +336,7 @@ def classLabelMax(tpm, middle, late):
     return tpmOut
 
 
-def getClassByKmeans(df:pd.DataFrame, k: int) -> pd.DataFrame:
+def getClassByKmeans(df:pd.DataFrame, timeCols: list[str], k: int) -> pd.DataFrame:
     """
     Input parameters:
     k: number of clusters
@@ -346,22 +346,11 @@ def getClassByKmeans(df:pd.DataFrame, k: int) -> pd.DataFrame:
     """
 
     k = int(k)
-
-    def is_float(s):
-        try:
-            float(s)
-            return True
-        except Exception:
-            return False
-
     # keep only phage genes
     df_phages = df[df["Entity"] == "phage"].copy()
-    # get time columns
-    time_cols_original = [c for c in df_phages.columns if is_float(c)]
-    time_cols_sorted = sorted(time_cols_original, key=lambda x: float(x))
 
     # expression matrix for clustering
-    dataset = df_phages[time_cols_sorted].astype(float)
+    dataset = df_phages[timeCols].astype(float)
     # run k-means
     kmeans = KMeans(n_clusters=k, random_state=42, n_init="auto").fit(dataset)
 
@@ -369,38 +358,41 @@ def getClassByKmeans(df:pd.DataFrame, k: int) -> pd.DataFrame:
 
     centers = pd.DataFrame(
         kmeans.cluster_centers_,
-        columns=time_cols_sorted
+        columns=timeCols
     )
 
-    # order clusters by the time point of maximal expression
-    ordered_cluster_ids = centers.to_numpy().argmax(axis=1).argsort()
 
-    # map original k-means cluster ID to ordered class ID
-    cluster_to_ordered_class = {
-        cluster_id: ordered_class
-        for ordered_class, cluster_id in enumerate(ordered_cluster_ids)
-    }
-
-    # assign ordered class to each gene
-    df_phages["ClassKMeans"] = [
-        cluster_to_ordered_class[label]
-        for label in labels
-    ]
+    # times as floats
+    t = np.asarray([float(c) for c in timeCols])
+    # centers
+    W = centers.to_numpy()
+    # peak time weighted by (relative) center positions
+    peak_time = (W * t).sum(axis=1) / W.sum(axis=1) 
+    # orders by peak_time first, solves ties by other means.
+    order = np.lexsort((W.sum(axis=1), W.argmax(axis=1), peak_time))
+    # creates dict that maps cluster IDs to the early-to-late order
+    cluster_to_class = {cid: cls for cls, cid in enumerate(order)}
+    # makes Series with the early-to-late order with index as corresponding(index from df_phages) gene(with each one label)
+    clusters = pd.Series(
+        [cluster_to_class[l] for l in labels],
+        index = df_phages.index,
+        name="ClassKMeans",
+    )
 
     df_final = df.copy()
-    df_final["ClassKMeans"] = df_phages["ClassKMeans"]
-    return df_phages
+    df_final["ClassKMeans"] = clusters.reindex(df.index)
+    return df_final
 
 
 # returns the times at the start of column names skipping non-sample columns
-def findTimes(df):
-    cols = df.columns.values
-    lis = []
-    for i in cols:
-        m = re.match(r"(\d*)", i).group()
-        if m:
-            lis.append(m)
-    return lis
+# def findTimes(df):
+#     cols = df.columns.values
+#     lis = []
+#     for i in cols:
+#         m = re.match(r"(\d*)", i).group()
+#         if m:
+#             lis.append(m)
+#     return lis
 
 # Find how many rows to skip by assuming the first row that has a tab should not be skipped
 def findRow(path):
@@ -419,10 +411,10 @@ def findEntity(df):
     return { 'host' : host, 'phage' : phage, host : 'host', phage: 'phage'}
 
 def parseDict(string):
-    lis = string.split(', ')
+    lis = string.split(',')
     dic = {}
     for i in lis:
-        dic[i.split(':')[0]] = i.split(':')[1]
+        dic[i.split(':')[0].strip()] = i.split(':')[1].strip()
     return dic
 
 
@@ -442,3 +434,13 @@ def get_args():
     parser.add_argument('--kmeans', type=int)
 
     return parser.parse_args()
+
+# assumes df columns to be exclusively [times]_[any]
+def getTimes(df):
+    names = df.columns.to_list()
+    times_set = {c.split('_', 1)[0] for c in names}
+    times = sorted(times_set, key=float)
+
+    # could also return dict (name:time, time:[names]) if ever needed
+
+    return names, times

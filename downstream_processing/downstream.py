@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 
 import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.decomposition import PCA
+# import numpy as np
+# import matplotlib.pyplot as plt
+# import seaborn as sns
+# from sklearn.decomposition import PCA
 from tools import *
 #import warnings
 #warnings.filterwarnings('ignore')
@@ -62,7 +62,7 @@ df = changeColnames(df_initial.iloc[:,5:df_initial.shape[1]], metadataFull)
 df = df.sort_index(axis=1)
 # df = df[['0_R1', '0_R2', '0_R3', '1_R1', '1_R2', '1_R3', '4_R1', '4_R2', '4_R3', '7_R1', '7_R2', '7_R3', '20_R1', '20_R2', '20_R3']]
 
-sampleNames = df.columns.to_list()
+sampleNames, sampleTimes = getTimes(df)
 
 # ### 2.2 Remove rRNA genes
 # 
@@ -116,7 +116,7 @@ gff3 = gff3.loc[gff3.iloc[:,2] == 'gene']
 # Format new columns GeneID, GeneType and GeneSymbol by extracting substrings of attributes column
 gff3['ID'] = pd.DataFrame(gff3.iloc[:,8].str.split('ID=', expand = True)).iloc[:,1].str.split(';', expand = True).iloc[:,0]
 gff3['GeneType'] = pd.DataFrame(gff3.iloc[:,8].str.split('gene_biotype=', expand = True)).iloc[:,1].str.split(';', expand = True).iloc[:,0]
-gff3['Symbol'] = pd.DataFrame(gff3.iloc[:,8].str.split('gene=', expand = True)).iloc[:,1].str.split(';', expand = True).iloc[:,0]
+gff3['Symbol'] = pd.DataFrame(gff3.iloc[:,8].str.split('gene=', expand = True)).iloc[:,1].str.split(';', expand = True).iloc[:,0].fillna(gff3_genes["ID"])
 
 # Add entity host and phage column based on seqid column
 # entity = {'NC_000913.3' : 'host', 'NC_000866.4' : 'phage'} # this needs to be adapted depending on phage-host interaction
@@ -132,7 +132,7 @@ gff3.index = gff3['ID']
 rRNAs = gff3.loc[gff3['GeneType'] == 'rRNA', 'ID'].tolist()
 
 # Perform rRNA depletion
-df_norRNAs = rRNAdepletion(df,rRNAs)
+df_norRNAs = rRNAdepletion(df,rRNAs).sort_index()
 
 # Verify rRNA depletion
 # Maybe throw error?
@@ -157,14 +157,13 @@ df_norRNAs[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
 # GeneSymbols are added to tpm table
 tpms = fillSymbols(tpms)
 tpms = make_unique_with_index(tpms)
-
 # ### 2.4 logTPM normalization
 
 # TPM values are further log-transformed using `logNorm(tpms.iloc[:, :-2])` (raw TPM matrix as input). Entity and Symbols are added afterwards.
 
 # Log transformation of tpm values
-logTPMs = logNorm(tpms.iloc[:, :-2])
-logTPMs = logTPMs.join(tpms.iloc[:, -2:])
+logTPMs = logNorm(tpms[sampleNames])
+logTPMs = logTPMs.join(tpms[['Entity', 'Symbol']])
 logTPMs = fillSymbols(logTPMs)
 # Make gene names unique
 logTPMs = make_unique_with_index(logTPMs)
@@ -172,7 +171,7 @@ logTPMs = make_unique_with_index(logTPMs)
 
 
 # Log2+1 normalization of raw counts
-logs = logNorm(df_norRNAs.iloc[:, :-2])
+logs = logNorm(df_norRNAs[sampleNames])
 #logTPMs = logTPMs.join(df_norRNAs.iloc[:, -2:])
 logs['Entity'] = gff3.loc[sorted(logs.index.to_list()), 'Entity']
 logs['Symbol'] = gff3.loc[sorted(logs.index.to_list()), 'Symbol']
@@ -194,15 +193,15 @@ logs = make_unique_with_index(logs)
 #                '7_R1', '7_R2', '7_R3', 
 #                '20_R1', '20_R2', '20_R3']
 
-columnOrder = df.sort_index(axis=1).columns.tolist()
+# columnOrder = df.sort_index(axis=1).columns.tolist()
 
-# PCA on tpms values
-txPCA(tpms[columnOrder])
-plt.title("PCA on TPM values")
+# # PCA on tpms values
+# txPCA(tpms[columnOrder])
+# plt.title("PCA on TPM values")
 
-# PCA on logTPM values
-txPCA(logTPMs[columnOrder])
-plt.title("PCA on logTPM values")
+# # PCA on logTPM values
+# txPCA(logTPMs[columnOrder])
+# plt.title("PCA on logTPM values")
 
 # For further analysis, PCA is performed on host and phage genes separately. For this, we filter our dataframes for the corresponding genes.
 
@@ -232,10 +231,10 @@ logTPMsPhage = logTPMs[logTPMs['Entity'] == 'phage']
 
 # updatedOrder = df.drop(['4_R1'], axis = 1).sort_index(axis=1).columns.tolist()
 
-# Or if no samples need to be excluded
+# # Or if no samples need to be excluded
 
-# Keep tables as is if no exclusion necessary 
-updatedOrder = columnOrder
+# # Keep tables as is if no exclusion necessary 
+# updatedOrder = columnOrder
 
 # Updated tpms
 # txPCA(tpms[updatedOrder])
@@ -268,33 +267,34 @@ updatedOrder = columnOrder
 # We will now summarize time points with mean and standard deviation for TPM-normalized data. First, we update the tpms and raw counts dataframe by dropping sample 4_R1, as well as adding the Entity and Symbol column to df_norRNAs.
 
 # Updated tpms dataframe 
-tpmsUpdated = tpms #.drop('4_R1', axis = 1)
-logsUpdated = logs #.drop('4_R1', axis = 1)
+# can manually drop 
+tpmsUpdated = tpms.copy() #.drop('4_R1', axis = 1)
+logsUpdated = logs.copy() #.drop('4_R1', axis = 1)
 
 # Updated raw counts dataframe
-df_norRNAsUpdated = df_norRNAs #.drop('4_R1', axis = 1)
+df_norRNAsUpdated = df_norRNAs.copy() #.drop('4_R1', axis = 1)
 
 # Next, we generate dataframes containing mean and standard deviation of gene expression values at specific timepoints by applying `getMeanSD` which again takes raw tpms matrix (without `Entity` and `Symbol`) as input. After creation, we add `Entity` and `Symbol` again.
 
 # Create dataframes for tpm means and standard deviations
-TPMmeans, TPMsds = getMeanSD(tpmsUpdated[updatedOrder])
+TPMmeans, TPMsds = getMeanSD(tpmsUpdated[sampleNames], sampleTimes)
 
 # Add Entity and Symbol to TPMmeans again
 # TPMmeans = TPMmeans[['0', '1', '4', '7', '20']] # adapt to dataset
-TPMmeans = TPMmeans.sort_index(axis=1)
+TPMmeans = TPMmeans.sort_index(axis=1,key=lambda idx: idx.map(lambda x: float(x)))
 TPMmeans[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
 
 # Add Entity and Symbol to TPMsds again
 # TPMsds = TPMsds[['0', '1', '4', '7', '20']] # adapt to dataset
-TPMsds = TPMsds.sort_index(axis=1)
+TPMsds = TPMsds.sort_index(axis=1,key=lambda idx: idx.map(lambda x: float(x)))
 TPMsds[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
 
 # We also calculate relative expression values for each gene, using TPM-normalized means to scale to highest expression per gene across time points, by running `proportionalExp` on the raw TPMmeans matrix. Afterwards, we again add `Entity` and `Symbol` to the dataframe.
 
 # Create dataframe with relative expression values compared to highest expression timepoint
 # TPMmeansCopy = TPMmeans[['0','1','4','7','20']].copy() # adapt to dataset
-times = findTimes(TPMmeans)
-TPMmeansCopy = TPMmeans[times].copy()
+# times = findTimes(TPMmeans)
+TPMmeansCopy = TPMmeans[sampleTimes].copy()
 propExp = proportionalExp(TPMmeansCopy)
 propExp[['Entity', 'Symbol']] = TPMmeans[['Entity', 'Symbol']]
 propExp.head(2)
@@ -315,10 +315,13 @@ propExp.head(2)
 # One may need to add more conditions, if more timepoints are available.
 # Classify phage genes according to set timepoints in the respective functions
 
-TPMmeans = classLabelThreshold(TPMmeans,middle,late)
-TPMmeans = classLabelMax(TPMmeans,middle,late)
-if isinstance(kmeans,int):
-    TPMmeans = getClassByKmeans(TPMmeans,kmeans)
+
+TPMmeans = classLabelThreshold(TPMmeans, sampleTimes ,middle, late)
+TPMmeans = classLabelMax(TPMmeans, sampleTimes ,middle, late)
+if isinstance(kmeans,int) and kmeans > 0:
+    propExp = getClassByKmeans(propExp, sampleTimes, kmeans)
+else:
+    propExp["ClassKMeans"] = pd.NA
 
 # TPMmeans[TPMmeans["Entity"] == "phage"].head(2)
 
@@ -329,8 +332,16 @@ tpmsUpdated[['ClassThreshold', 'ClassMax']] = TPMmeans[['ClassThreshold', 'Class
 logsUpdated[['ClassThreshold', 'ClassMax']] = TPMmeans[['ClassThreshold', 'ClassMax']]
 propExp[['ClassThreshold', 'ClassMax']] = TPMmeans[['ClassThreshold', 'ClassMax']]
 
+
+TPMsds["ClassKMeans"] = propExp["ClassKMeans"]
+tpmsUpdated["ClassKMeans"] = propExp["ClassKMeans"]
+logsUpdated["ClassKMeans"] = propExp["ClassKMeans"]
+TPMmeans["ClassKMeans"] = propExp["ClassKMeans"]
+
+
 # gff3
-gff3_final = gff3_genes.merge(TPMmeans[["ClassThreshold", "ClassMax"]], right_index=True, left_on="ID", how="left")
+# print(TPMmeans.loc[TPMmeans['Entity'] == "phage", "ClassKMeans"])
+gff3_final = gff3_genes.merge(TPMmeans[["ClassThreshold", "ClassMax", "ClassKMeans"]], right_index=True, left_on="ID", how="left")
 gff3_host  = gff3_final[gff3_final['seq_id'] == entity["host"]]
 gff3_phage = gff3_final[gff3_final['seq_id'] == entity["phage"]]
 
@@ -339,7 +350,7 @@ gff3_phage = gff3_final[gff3_final['seq_id'] == entity["phage"]]
 # Lastly, we will assess the variability of each gene based on its gene expressionl. To do so, we calculate the stabilized variance of tpm expression values (variance / mean) for each gene across all timepoints and replicates using the function `stabilizedVariance`.
 
 # Add stabilized variance of genes over timepoints to tpms dataframe
-tpmsUpdated = stabilizedVariance(tpmsUpdated)
+tpmsUpdated = stabilizedVariance(tpmsUpdated, sampleNames)
 # tpmsUpdated.head()
 
 # Calculated variances are further added to other dataframes.
@@ -351,6 +362,7 @@ TPMsds['Variance'] = tpmsUpdated['Variance']
 propExp['Variance'] = tpmsUpdated['Variance']
 
 df_norRNAs[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
+tpmsUpdated[['Entity', 'Symbol']] = tpms[['Entity', 'Symbol']]
 df_norRNAsUpdated = df_norRNAs #.drop('4_R1', axis = 1)
 
 def removeOutlierFromList(list, outlier):
@@ -369,15 +381,15 @@ def addSuffix(times, suffix):
 
 sampleNamesUpdated = removeOutlierFromList(sampleNames, "none")
 
-all = df_norRNAsUpdated
+all = df_norRNAsUpdated.copy()
 all[addSuffix(sampleNamesUpdated, "_TPM")] = tpmsUpdated[sampleNamesUpdated]
-all[['Variance', 'ClassThreshold', 'ClassMax']] = tpmsUpdated[['Variance', 'ClassMax', 'ClassThreshold']]
-all[addSuffix(times, "_TPMmeans")] = TPMmeans[times]
-all[addSuffix(times, "_TPMsds")] = TPMsds[times]
-all[addSuffix(times, "_relExp")] = propExp[times]
+all[['Variance', 'ClassThreshold', 'ClassMax', 'ClassKMeans']] = propExp[['Variance', 'ClassThreshold', 'ClassMax', 'ClassKMeans']]
+all[addSuffix(sampleTimes, "_TPMmeans")] = TPMmeans[sampleTimes]
+all[addSuffix(sampleTimes, "_TPMsds")] = TPMsds[sampleTimes]
+all[addSuffix(sampleTimes, "_relExp")] = propExp[sampleTimes]
 all = all.sort_index(axis=1)
 
-# ## 7. Write data to output
+## 7. Write data to output
 
 # Full TPM table
 tpmsUpdated.to_csv('full_TPM.tsv', sep = '\t')
@@ -409,3 +421,8 @@ TPMsds.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_TPM_std.ts
 propExp.loc[tpmsUpdated['Entity'] == 'phage'].to_csv('phage_only/phage_fractional_expression.tsv', sep = '\t')
 # all
 all.loc[all['Entity'] == 'phage'].to_csv('phage_only/phage_all_values.tsv', sep = '\t')
+
+print(all['Entity'].value_counts())
+print(all['ClassThreshold'].value_counts())
+print(all['ClassMax'].value_counts())
+print(all["ClassKMeans"].value_counts())
